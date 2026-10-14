@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบรายงานประจำวัน - Pleang Recruit Team Recruiter Network</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Chart.js สำหรับทำกราฟ -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Prompt', sans-serif; }
+        @media print {
+            body * { visibility: hidden; }
+            #printableReport, #printableReport * { visibility: visible; }
+            #printableReport { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <!-- LOGIN OVERLAY MODAL -->
+    <div id="loginModal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center">
+            <div class="bg-orange-600 text-white font-bold w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 text-lg shadow-lg">
+                KEX
+            </div>
+            <h2 id="l-title" class="text-xl font-bold text-gray-800 mb-1">KEX Recruiter Login</h2>
+            <p id="l-desc" class="text-xs text-gray-500 mb-5">กรุณาระบุชื่อเจ้าหน้าที่สรรหาเพื่อเข้าสู่ระบบ (พิมพ์ "Super Admin" เพื่อดูข้อมูลทุกคน)</p>
+            
+            <form id="loginForm" class="space-y-4 text-left">
+                <div>
+                    <label id="l-label" class="block text-xs font-semibold text-gray-600 uppercase mb-1">👤 ชื่อเจ้าหน้าที่สรรหา (Recruiter Name)</label>
+                    <input type="text" id="inputRecruiterName" placeholder="เช่น เพลง หรือ Super Admin" required class="w-full bg-gray-50 border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                </div>
+                <button type="submit" id="l-btn" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-3 rounded-xl transition shadow cursor-pointer">
+                    เข้าสู่ระบบ
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Top Bar / Header -->
+    <header class="bg-[#1e222b] text-white h-14 flex items-center justify-between px-3 sm:px-4 shadow-md shrink-0">
+        <div class="flex items-center space-x-2">
+            <div class="bg-orange-600 text-white font-bold p-1.5 rounded-lg text-xs flex items-center justify-center shadow">
+                KEX
+            </div>
+            <div class="truncate">
+                <span class="font-bold text-xs sm:text-sm tracking-wide truncate block">KEX Recruiter Network.</span>
+                <span id="currentRecruiterDisplay" class="text-[10px] sm:text-xs text-orange-400 block -mt-1 truncate">ผู้ใช้งาน: -</span>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2 text-xs">
+            <button onclick="toggleLanguage()" class="bg-slate-700 hover:bg-slate-600 text-white px-2 py-1.5 rounded-lg transition font-medium cursor-pointer text-[11px]" id="langSwitchBtn">
+                🌐 ไทย / 中文
+            </button>
+            <button onclick="goHome()" class="bg-orange-600 hover:bg-orange-700 text-white px-2.5 py-1.5 rounded-lg transition font-medium cursor-pointer flex items-center gap-1" id="nav-home-btn">
+                🏠 หน้าหลัก
+            </button>
+            <button onclick="logout()" class="bg-gray-700 hover:bg-gray-600 text-white px-2 py-1.5 rounded-lg transition cursor-pointer text-[11px]" id="logout-btn">
+                ออก
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto p-3 sm:p-6 max-w-7xl mx-auto w-full">
+        
+        <!-- VIEW 0: หน้าหลัก (Dashboard Hub) -->
+        <div id="view-home" class="space-y-4 sm:space-y-6">
+            <div class="bg-gradient-to-r from-slate-900 to-[#1e222b] rounded-2xl p-5 sm:p-8 text-white shadow-lg">
+                <h1 id="h-title" class="text-xl sm:text-3xl font-bold mb-2">👋 ยินดีต้อนรับสู่ระบบบริหารงานสรรหา Pleang Recruit Team</h1>
+                <p id="h-desc" class="text-gray-300 text-xs sm:text-sm">เลือกเมนูด้านล่างนี้เพื่อจัดการข้อมูล บันทึกรายงานประจำวัน และตรวจสอบสถิติต่างๆ</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <div onclick="switchView('overview')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 hover:border-orange-500 hover:shadow-md transition cursor-pointer flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-lg mb-3 shadow-sm">📊</div>
+                        <h3 class="text-base font-bold text-gray-800 mb-1" id="card-1-title">ภาพรวมผลงาน & กราฟคู่ POD</h3>
+                        <p class="text-xs text-gray-500" id="card-1-desc">ดูกราฟเปรียบเทียบพนักงานมาทำงานกับยอดเซ็นรับพัสดุ (POD) ประจำวัน</p>
+                    </div>
+                    <div class="mt-4 text-orange-600 text-xs font-semibold flex items-center gap-1">เปิดใช้งาน →</div>
+                </div>
+
+                <div onclick="switchView('report')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 hover:border-orange-500 hover:shadow-md transition cursor-pointer flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center text-lg mb-3 shadow-sm">📋</div>
+                        <h3 class="text-base font-bold text-gray-800 mb-1" id="card-2-title">Daily Report (6 ข้อกำหนด)</h3>
+                        <p class="text-xs text-gray-500" id="card-2-desc">บันทึกรายงานประจำวัน 6 หัวข้อ พร้อมคัดลอกส่ง Line หรือดาวน์โหลด PDF</p>
+                    </div>
+                    <div class="mt-4 text-orange-600 text-xs font-semibold flex items-center gap-1">เปิดใช้งาน →</div>
+                </div>
+
+                <div onclick="switchView('employees')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 hover:border-orange-500 hover:shadow-md transition cursor-pointer flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg mb-3 shadow-sm">🗂️</div>
+                        <h3 class="text-base font-bold text-gray-800 mb-1" id="card-3-title">ข้อมูลพนักงานจัดส่งพัสดุ</h3>
+                        <p class="text-xs text-gray-500" id="card-3-desc">จัดการรายชื่อ รหัสพนักงาน (EMP_ID) และช่องทางการสรรหา</p>
+                    </div>
+                    <div class="mt-4 text-orange-600 text-xs font-semibold flex items-center gap-1">เปิดใช้งาน →</div>
+                </div>
+
+                <div onclick="switchView('pod')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 hover:border-orange-500 hover:shadow-md transition cursor-pointer flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-lg mb-3 shadow-sm">📦</div>
+                        <h3 class="text-base font-bold text-gray-800 mb-1" id="card-4-title">บันทึกยอด POD รายบุคคล</h3>
+                        <p class="text-xs text-gray-500" id="card-4-desc">บันทึกและจัดการยอดจัดส่งพัสดุของพนักงานแต่ละคน</p>
+                    </div>
+                    <div class="mt-4 text-orange-600 text-xs font-semibold flex items-center gap-1">เปิดใช้งาน →</div>
+                </div>
+
+                <div onclick="switchView('workplan')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 hover:border-orange-500 hover:shadow-md transition cursor-pointer flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-lg mb-3 shadow-sm">📅</div>
+                        <h3 class="text-base font-bold text-gray-800 mb-1" id="card-5-title">Work Plan (แผนงาน 6 แถว)</h3>
+                        <p class="text-xs text-gray-500" id="card-5-desc">จัดการบันทึกแผนงาน Main work, Tomorrow plan และ Others (6 แถว)</p>
+                    </div>
+                    <div class="mt-4 text-orange-600 text-xs font-semibold flex items-center gap-1">เปิดใช้งาน →</div>
+                </div>
+
+                <div onclick="switchView('resignation')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 hover:border-orange-500 hover:shadow-md transition cursor-pointer flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-lg mb-3 shadow-sm">👥</div>
+                        <h3 class="text-base font-bold text-gray-800 mb-1" id="card-6-title">วิเคราะห์การลาออก</h3>
+                        <p class="text-xs text-gray-500" id="card-6-desc">รวบรวมสถิติและเหตุผลการลาออกของพนักงานในระบบ</p>
+                    </div>
+                    <div class="mt-4 text-orange-600 text-xs font-semibold flex items-center gap-1">เปิดใช้งาน →</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 1: ภาพรวมผลงานพร้อมสรุป 6 ข้อกำหนดและกราฟคู่ -->
+        <div id="view-overview" class="view-content hidden space-y-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-800" id="ov-heading">📊 ภาพรวมผลงานและสถิติ 6 ข้อกำหนด</h2>
+                <button onclick="goHome()" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs sm:text-sm font-medium rounded-xl transition cursor-pointer">← หน้าหลัก</button>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 space-y-6">
+                <!-- สรุปข้อมูลตัวเลขจาก 6 ข้อกำหนด (ส่วนนี้คงไว้ตามคำขอ) -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <h3 class="text-xs sm:text-sm font-bold text-slate-800 mb-3" id="summary-6-title">📋 สรุปผลรวมตัวเลขจาก 6 ข้อกำหนด (ย้อนหลังทั้งหมด)</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-center">
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200">
+                            <span class="text-[10px] text-gray-500 block">1. 邀约 (นัดหมาย)</span>
+                            <span id="sum-invite" class="text-base sm:text-lg font-bold text-slate-900">0</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200">
+                            <span class="text-[10px] text-gray-500 block">1. 开号 (เปิดรหัส)</span>
+                            <span id="sum-open" class="text-base sm:text-lg font-bold text-emerald-600">0</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200">
+                            <span class="text-[10px] text-gray-500 block">2. 入职 (ช่องทางรวม)</span>
+                            <span id="sum-channel" class="text-base sm:text-lg font-bold text-blue-600">0</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200">
+                            <span class="text-[10px] text-gray-500 block">3. 有效 (บัญชีใช้งาน)</span>
+                            <span id="sum-effective" class="text-base sm:text-lg font-bold text-purple-600">0</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200">
+                            <span class="text-[10px] text-gray-500 block">4. 订单 (ยอด POD)</span>
+                            <span id="sum-orders" class="text-base sm:text-lg font-bold text-orange-600">0</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200">
+                            <span class="text-[10px] text-gray-500 block">5. 离职 (ลาออก)</span>
+                            <span id="sum-resigned" class="text-base sm:text-lg font-bold text-rose-600">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <h3 class="text-xs sm:text-sm font-bold text-gray-700 mb-3" id="chart-heading">📈 กราฟเปรียบเทียบ: บัญชีใช้งานจริง (เส้น) vs ยอด POD (แท่ง)</h3>
+                    <div class="relative h-64 sm:h-80 w-full">
+                        <canvas id="dualChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: Daily Report (6 ข้อกำหนดประจำวัน) -->
+        <div id="view-report" class="view-content hidden space-y-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-800" id="rep-heading">📋 Daily Report (รายงานประจำวัน 6 ข้อกำหนด)</h2>
+                <button onclick="goHome()" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs sm:text-sm font-medium rounded-xl transition cursor-pointer">← หน้าหลัก</button>
+            </div>
+
+            <div id="printableReport" class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 no-print">
+                    <span class="text-xs text-gray-400" id="pdf-hint">แบบฟอร์มพร้อมดาวน์โหลด PDF หรือส่ง Line</span>
+                    <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                        <button onclick="copyDailyReport()" class="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-medium px-3 py-2 rounded-lg transition flex items-center justify-center gap-1 cursor-pointer shadow-sm">
+                            📋 คัดลอก Line
+                        </button>
+                        <button onclick="downloadPDF()" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium px-3 py-2 rounded-lg transition flex items-center justify-center gap-1 cursor-pointer shadow-sm">
+                            📥 PDF
+                        </button>
+                        <button onclick="exportData()" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-medium px-3 py-2 rounded-lg transition flex items-center justify-center gap-1 cursor-pointer shadow-sm">
+                            📥 JSON
+                        </button>
+                    </div>
+                </div>
+
+                <form id="reportForm" class="space-y-4 sm:space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-gray-50 p-3 sm:p-4 rounded-xl border border-gray-200">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Employee ID</label>
+                            <input type="text" id="reportEmpId" placeholder="เช่น BG557970" required class="w-full bg-white border border-gray-300 rounded-lg p-2.5 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1" id="lbl-name">Name</label>
+                            <input type="text" id="reportName" placeholder="เช่น เพลง" required class="w-full bg-white border border-gray-300 rounded-lg p-2.5 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1" id="lbl-date">Date</label>
+                            <input type="date" id="reportDate" required class="w-full bg-white border border-gray-300 rounded-lg p-2.5 text-sm">
+                        </div>
+                    </div>
+
+                    <!-- ข้อ 1 -->
+                    <div class="border border-gray-300 rounded-xl overflow-hidden shadow-sm">
+                        <div class="bg-slate-900 text-white px-3 sm:px-4 py-2.5 font-bold text-xs sm:text-sm" id="sec-1-title">1. 邀约人数，开号人数 (นัดหมาย และเปิดรหัสพนักงาน)</div>
+                        <div class="p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-inv">จำนวนผู้ติดต่อ/นัดหมาย (邀约人数)</label>
+                                <input type="number" id="inviteCount" placeholder="เช่น 15" required class="w-full bg-gray-50 border rounded-lg p-2.5 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-open">จำนวนเปิดรหัสพนักงาน (开号人数)</label>
+                                <input type="number" id="openCodeCount" placeholder="เช่น 4" required class="w-full bg-gray-50 border rounded-lg p-2.5 text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ข้อ 2 -->
+                    <div class="border border-gray-300 rounded-xl overflow-hidden shadow-sm">
+                        <div class="bg-slate-900 text-white px-3 sm:px-4 py-2.5 font-bold text-xs sm:text-sm" id="sec-2-title">2. 入职渠道 (ช่องทางการสรรหา)</div>
+                        <div class="p-3 sm:p-4 grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3 bg-white">
+                            <div><label class="block text-[10px] text-gray-600 mb-1">สาขาKexแนะนำ</label><input type="number" id="ch_kex_branch" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm"></div>
+                            <div><label class="block text-[10px] text-gray-600 mb-1">TA Kex แนะนำ</label><input type="number" id="ch_ta" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm"></div>
+                            <div><label class="block text-[10px] text-gray-600 mb-1" id="lbl-ch-other">ค่ายอื่น</label><input type="number" id="ch_other_camp" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm"></div>
+                            <div><label class="block text-[10px] text-gray-600 mb-1">Online</label><input type="number" id="ch_online" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm"></div>
+                            <div class="col-span-2 sm:col-span-1"><label class="block text-[10px] text-gray-600 mb-1" id="lbl-ch-others">อื่นๆ</label><input type="number" id="ch_others" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm"></div>
+                        </div>
+                    </div>
+
+                    <!-- ข้อ 3 & 4 -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="border border-gray-300 rounded-xl overflow-hidden shadow-sm bg-white">
+                            <div class="bg-slate-900 text-white px-3 sm:px-4 py-2.5 font-bold text-xs sm:text-sm" id="sec-3-title">3. 有效账号 (จำนวนบัญชีใช้งานจริง)</div>
+                            <div class="p-3 sm:p-4"><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-eff">จำนวนบัญชีใช้งานจริง</label><input type="number" id="effectiveAccounts" placeholder="เช่น 42" required class="w-full bg-gray-50 border rounded-lg p-2.5 text-sm"></div>
+                        </div>
+                        <div class="border border-gray-300 rounded-xl overflow-hidden shadow-sm bg-white">
+                            <div class="bg-slate-900 text-white px-3 sm:px-4 py-2.5 font-bold text-xs sm:text-sm" id="sec-4-title">4. 日度订单达成 (ยอดส่งพัสดุ POD)</div>
+                            <div class="p-3 sm:p-4"><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-pod">ยอดรวม POD (ชิ้น)</label><input type="number" id="dailyOrders" placeholder="เช่น 1500" required class="w-full bg-gray-50 border rounded-lg p-2.5 text-sm"></div>
+                        </div>
+                    </div>
+
+                    <!-- ข้อ 5 -->
+                    <div class="border border-gray-300 rounded-xl overflow-hidden shadow-sm">
+                        <div class="bg-slate-900 text-white px-3 sm:px-4 py-2.5 font-bold text-xs sm:text-sm" id="sec-5-title">5. 人员离职详细信息 (รายละเอียดพนักงานลาออก)</div>
+                        <div class="p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white">
+                            <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-res-c">จำนวนลาออก (คน)</label><input type="number" id="resignedCount" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2.5 text-sm"></div>
+                            <div class="sm:col-span-2"><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-res-d">รายละเอียดและเหตุผล</label><input type="text" id="resignationDetail" placeholder="เช่น สมชาย / สาขาบางนา / เปลี่ยนงาน" class="w-full bg-gray-50 border rounded-lg p-2.5 text-sm"></div>
+                        </div>
+                    </div>
+
+                    <!-- ข้อ 6 -->
+                    <div class="border border-gray-300 rounded-xl overflow-hidden shadow-sm">
+                        <div class="bg-slate-900 text-white px-3 sm:px-4 py-2.5 font-bold text-xs sm:text-sm" id="sec-6-title">6. 日度网点巡查规划 (แผนงานการออกตรวจเยี่ยมสาขา)</div>
+                        <div class="p-3 sm:p-4 bg-white">
+                            <label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-plan">แผนการออกตรวจเยี่ยมสาขาประจำวัน</label>
+                            <textarea id="siteInspectionPlan" rows="2" placeholder="เช่น ไปสาขาบางกอกน้อย อบรม Store Manager และ CS ใหม่" class="w-full bg-gray-50 border rounded-lg p-2.5 text-sm"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-orange-50 p-3 sm:p-4 rounded-xl border border-orange-200">
+                        <div><label class="block text-[11px] font-semibold text-orange-900 mb-1" id="lbl-branch">🏢 สาขา Kex / Station</label><input type="text" id="branchKex" placeholder="SKV / BKKC2" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
+                        <div><label class="block text-[11px] font-semibold text-orange-900 mb-1" id="lbl-hour">⏰ ชั่วโมงทำงาน</label><input type="number" id="workingHours" value="8" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
+                    </div>
+
+                    <div class="flex justify-end pt-2 no-print">
+                        <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-orange-600 text-white font-medium rounded-xl hover:bg-orange-700 transition shadow cursor-pointer">💾 บันทึก Daily Report</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mt-6 no-print">
+                <div class="p-4 border-b border-gray-200 font-bold text-gray-800 text-xs sm:text-sm flex justify-between items-center">
+                    <span id="hist-title">📋 ประวัติรายงานย้อนหลัง</span>
+                    <span id="recordCount" class="text-xs text-gray-500 font-normal">ทั้งหมด 0 รายการ</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[650px]">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-500 text-[11px] uppercase tracking-wider border-b border-gray-200">
+                                <th class="p-3" id="th-date">วันที่ / ผู้บันทึก</th>
+                                <th class="p-3" id="th-inv">1. 邀约/开号</th>
+                                <th class="p-3" id="th-ch">2. 入职渠道</th>
+                                <th class="p-3" id="th-eff">3-4. บัญชี / ยอด POD</th>
+                                <th class="p-3" id="th-act">5-6. ลาออก / แผน巡查</th>
+                                <th class="p-3 text-center" id="th-manage">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTableBody" class="text-xs sm:text-sm divide-y divide-gray-100 text-gray-700"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: ข้อมูลพนักงาน -->
+        <div id="view-employees" class="view-content hidden space-y-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-800" id="emp-heading">🗂️ ฐานข้อมูลพนักงานจัดส่งพัสดุ</h2>
+                <button onclick="goHome()" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs sm:text-sm font-medium rounded-xl transition cursor-pointer">← หน้าหลัก</button>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6">
+                <form id="employeeForm" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-3 bg-gray-50 p-3 sm:p-4 rounded-xl border border-gray-200 mb-6">
+                    <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1">EMP_ID</label><input type="text" id="empId" placeholder="10020525" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
+                    <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-emp-name">ชื่อ-นามสกุล</label><input type="text" id="empName" placeholder="อรัญ" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
+                    <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1">Station</label><input type="text" id="empStation" placeholder="SKV" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
+                    <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-emp-type">ประเภท</label><select id="empType" class="w-full bg-white border rounded-lg p-2 text-sm"><option value="2W">2W</option><option value="4W">4W</option></select></div>
+                    <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-emp-ch">ช่องทางสรรหา</label><select id="empChannel" class="w-full bg-white border rounded-lg p-2 text-sm"><option value="สาขาKexแนะนำ">สาขาKexแนะนำ</option><option value="TA Kex แนะนำ">TA Kex แนะนำ</option><option value="ค่ายอื่น">ค่ายอื่น</option><option value="Online">Online</option><option value="อื่นๆ">อื่นๆ</option></select></div>
+                    <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-emp-stat">สถานะ</label><select id="empStatus" class="w-full bg-white border rounded-lg p-2 text-sm"><option value="Active">Active</option><option value="Resigned">Resigned</option></select></div>
+                    <div class="sm:col-span-2 md:col-span-6 flex justify-end"><button type="submit" class="w-full sm:w-auto px-5 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition shadow cursor-pointer">+ เพิ่มพนักงาน</button></div>
+                </form>
+
+                <div class="border border-gray-200 rounded-xl overflow-hidden">
+                    <div class="p-3 bg-gray-50 border-b text-xs font-semibold text-gray-600 flex justify-between"><span id="emp-list-title">รายชื่อพนักงาน</span><span id="employeeRecordCount">0 คน</span></div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs sm:text-sm min-w-[600px]">
+                            <thead class="bg-gray-100 border-b text-gray-600 text-[11px] uppercase">
+                                <tr><th class="p-3">EMP_ID</th><th class="p-3" id="th-emp-name">ชื่อ</th><th class="p-3">Station</th><th class="p-3" id="th-emp-type">ประเภท</th><th class="p-3" id="th-emp-ch">ช่องทาง</th><th class="p-3" id="th-emp-stat">สถานะ</th><th class="p-3 text-center" id="th-emp-mng">จัดการ</th></tr>
+                            </thead>
+                            <tbody id="employeeTableBody" class="divide-y text-gray-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 4: คีย์ยอด POD -->
+        <div id="view-pod" class="view-content hidden space-y-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-800" id="pod-heading">📦 บันทึกยอด POD รายบุคคล</h2>
+                <button onclick="goHome()" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs sm:text-sm font-medium rounded-xl transition cursor-pointer">← หน้าหลัก</button>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6">
+                <form id="podForm" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-3 bg-gray-50 p-3 sm:p-4 rounded-xl border border-gray-200 mb-6">
+                    <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-pod-date">วันที่</label><input type="date" id="podDate" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
+                    <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1">Emp_ID</label><input type="text" id="podEmpId" placeholder="10020525" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
+                    <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-pod-name">Staff_Name</label><input type="text" id="podStaffName" placeholder="ชื่อ" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
+                    <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1">Station</label><input type="text" id="podStation" placeholder="SKV" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
+                    <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-pod-val">ยอด POD</label><input type="number" step="0.01" id="podValue" placeholder="27" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
+                    <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-pod-rec">ชื่อผู้สรรหา</label><input type="text" id="podRecruiter" placeholder="ชื่อผู้สรรหา" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
+                    <div class="sm:col-span-2 md:col-span-6 flex justify-end"><button type="submit" class="w-full sm:w-auto px-5 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition shadow cursor-pointer">+ บันทึกยอด POD</button></div>
+                </form>
+
+                <div class="border border-gray-200 rounded-xl overflow-hidden">
+                    <div class="p-3 bg-gray-50 border-b text-xs font-semibold text-gray-600 flex justify-between"><span id="pod-list-title">รายการ POD</span><span id="podRecordCount">0 รายการ</span></div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs sm:text-sm min-w-[550px]">
+                            <thead class="bg-gray-100 border-b text-gray-600 text-[11px] uppercase">
+                                <tr><th class="p-3" id="th-pod-date">วันที่</th><th class="p-3">Emp_ID</th><th class="p-3" id="th-pod-name">ชื่อ</th><th class="p-3">Station</th><th class="p-3" id="th-pod-val">ยอด POD</th><th class="p-3" id="th-pod-rec">ผู้สรรหา</th><th class="p-3 text-center" id="th-pod-mng">จัดการ</th></tr>
+                            </thead>
+                            <tbody id="podTableBody" class="divide-y text-gray-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 5: Work Plan (แผนงาน 6 แถว) -->
+        <div id="view-workplan" class="view-content hidden space-y-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-800" id="wp-heading">📅 Work Plan (แผนงาน 6 แถว)</h2>
+                <button onclick="goHome()" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs sm:text-sm font-medium rounded-xl transition cursor-pointer">← หน้าหลัก</button>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 space-y-6">
+                <form id="workPlanForm" class="space-y-4 sm:space-y-6">
+                    <div class="bg-gray-50 p-3 sm:p-4 rounded-xl border border-gray-200">
+                        <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1" id="lbl-wp-date">วันที่ (Date)</label>
+                        <input type="date" id="wpDate" required class="w-full sm:w-64 bg-white border border-gray-300 rounded-lg p-2.5 text-sm">
+                    </div>
+
+                    <div class="border border-gray-300 rounded-xl overflow-hidden shadow-sm">
+                        <div class="bg-slate-900 text-white px-3 sm:px-4 py-2.5 font-bold text-xs sm:text-sm">
+                            <span id="wp-table-header">กรอกรายละเอียดงานทั้ง 6 แถว</span>
+                        </div>
+                        <div class="p-3 sm:p-4 space-y-3 bg-white">
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 p-3 bg-gray-50 rounded-xl border border-gray-200 items-center">
+                                <div class="sm:col-span-1 font-bold text-xs text-orange-600">No. 1</div>
+                                <div class="sm:col-span-8"><input type="text" id="det_1" placeholder="Work detail (รายละเอียดงาน)" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs sm:text-sm"></div>
+                                <div class="sm:col-span-3 flex items-center gap-1"><span class="text-[10px] text-gray-500 sm:hidden">ชม.</span><input type="number" id="hr_1" value="8" placeholder="ชม." class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs sm:text-sm"></div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 p-3 bg-gray-50 rounded-xl border border-gray-200 items-center">
+                                <div class="sm:col-span-1 font-bold text-xs text-gray-500">No. 2</div>
+                                <div class="sm:col-span-8"><input type="text" id="det_2" placeholder="Work detail (รายละเอียดงาน)" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs sm:text-sm"></div>
+                                <div class="sm:col-span-3 flex items-center gap-1"><span class="text-[10px] text-gray-500 sm:hidden">ชม.</span><input type="number" id="hr_2" value="0" placeholder="ชม." class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs sm:text-sm"></div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 p-3 bg-gray-50 rounded-xl border border-gray-200 items-center">
+                                <div class="sm:col-span-1 font-bold text-xs text-gray-500">No. 3</div>
+                                <div class="sm:col-span-8"><input type="text" id="det_3" placeholder="Work detail (รายละเอียดงาน)" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs sm:text-sm"></div>
+                                <div class="sm:col-span-3 flex items-center gap-1"><span class="text-[10px] text-gray-500 sm:hidden">ชม.</span><input type="number" id="hr_3" value="0" placeholder="ชม." class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs sm:text-sm"></div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 p-3 bg-gray-50 rounded-xl border border-gray-200 items-center">
+                                <div class="sm:col-span-1 font-bold text-xs text-gray-500">No. 4</div>
+                                <div class="sm:col-span-8"><input type="text" id="det_4" placeholder="Work detail (รายละเอียดงาน)" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs sm:text-sm"></div>
+                                <div class="sm:col-span-3 flex items-center gap-1"><span class="text-[10px] text-gray-500 sm:hidden">ชม.</span><input type="number" id="hr_4" value="0" placeholder="ชม." class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs sm:text-sm"></div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 p-3 bg-gray-50 rounded-xl border border-gray-200 items-center">
+                                <div class="sm:col-span-1 font-bold text-xs text-gray-500">No. 5</div>
+                                <div class="sm:col-span-8"><input type="text" id="det_5" placeholder="Work detail (รายละเอียดงาน)" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs sm:text-sm"></div>
+                                <div class="sm:col-span-3 flex items-center gap-1"><span class="text-[10px] text-gray-500 sm:hidden">ชม.</span><input type="number" id="hr_5" value="0" placeholder="ชม." class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs sm:text-sm"></div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 p-3 bg-gray-50 rounded-xl border border-gray-200 items-center">
+                                <div class="sm:col-span-1 font-bold text-xs text-gray-500">No. 6</div>
+                                <div class="sm:col-span-8"><input type="text" id="det_6" placeholder="Work detail (รายละเอียดงาน)" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs sm:text-sm"></div>
+                                <div class="sm:col-span-3 flex items-center gap-1"><span class="text-[10px] text-gray-500 sm:hidden">ชม.</span><input type="number" id="hr_6" value="0" placeholder="ชม." class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs sm:text-sm"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-2">
+                        <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-orange-600 text-white font-medium rounded-xl hover:bg-orange-700 transition shadow cursor-pointer">💾 บันทึก Work Plan</button>
+                    </div>
+                </form>
+
+                <div class="border border-gray-200 rounded-xl overflow-hidden mt-6">
+                    <div class="p-3 bg-gray-50 border-b text-xs font-semibold text-gray-600 flex justify-between"><span id="wp-list-title">ประวัติ Work Plan ย้อนหลัง</span><span id="wpRecordCount">0 รายการ</span></div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs sm:text-sm min-w-[500px]">
+                            <thead class="bg-gray-100 border-b text-gray-600 text-[11px] uppercase">
+                                <tr><th class="p-3" id="th-wp-date">วันที่</th><th class="p-3" id="th-wp-det">รายละเอียดทั้ง 6 แถว</th><th class="p-3 text-center" id="th-wp-mng">จัดการ</th></tr>
+                            </thead>
+                            <tbody id="workPlanTableBody" class="divide-y text-gray-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 6: วิเคราะห์การลาออก -->
+        <div id="view-resignation" class="view-content hidden space-y-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-800" id="res-heading">👥 วิเคราะห์เหตุผลการลาออกของพนักงาน</h2>
+                <button onclick="goHome()" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs sm:text-sm font-medium rounded-xl transition cursor-pointer">← หน้าหลัก</button>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6">
+                <div id="resignationListContainer" class="space-y-3"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- JavaScript Script -->
+    <script>
+        let currentLang = localStorage.getItem('kex_lang') || 'th';
+        let currentRecruiter = localStorage.getItem('kex_active_recruiter') || '';
+        let reports = [];
+        let employees = [];
+        let podRecords = [];
+        let workPlans = [];
+        let dualChartInstance = null;
+
+        const translations = {
+            th: {
+                loginTitle: "KEX Recruiter Login",
+                loginDesc: "กรุณาระบุชื่อเจ้าหน้าที่สรรหาเพื่อเข้าสู่ระบบ (พิมพ์ 'แม่' เพื่อดูข้อมูลทุกคน)",
+                loginLbl: "👤 ชื่อเจ้าหน้าที่สรรหา (Recruiter Name)",
+                loginBtn: "เข้าสู่ระบบ",
+                homeBtn: "🏠 หน้าหลัก",
+                logoutBtn: "ออก",
+                hTitle: "👋 ยินดีต้อนรับสู่ระบบบริหารงานสรรหา KEX",
+                hDesc: "เลือกเมนูด้านล่างนี้เพื่อจัดการข้อมูล บันทึกรายงานประจำวัน และตรวจสอบสถิติต่างๆ",
+                card1Title: "ภาพรวมผลงาน & กราฟคู่ POD",
+                card1Desc: "ดูกราฟเปรียบเทียบพนักงานมาทำงานกับยอดเซ็นรับพัสดุ (POD) ประจำวัน",
+                card2Title: "Daily Report (6 ข้อกำหนด)",
+                card2Desc: "บันทึกรายงานประจำวัน 6 หัวข้อ พร้อมคัดลอกส่ง Line หรือดาวน์โหลด PDF",
+                card3Title: "ข้อมูลพนักงานจัดส่งพัสดุ",
+                card3Desc: "จัดการรายชื่อ รหัสพนักงาน (EMP_ID) และช่องทางการสรรหา",
+                card4Title: "บันทึกยอด POD รายบุคคล",
+                card4Desc: "บันทึกและจัดการยอดจัดส่งพัสดุของพนักงานแต่ละคน",
+                card5Title: "Work Plan (แผนงาน 6 แถว)",
+                card5Desc: "จัดการบันทึกแผนงาน Main work, Tomorrow plan และ Others (6 แถว)",
+                card6Title: "วิเคราะห์การลาออก",
+                card6Desc: "รวบรวมสถิติและเหตุผลการลาออกของพนักงานในระบบ",
+                sec1Title: "1. 邀约人数，开号人数 (นัดหมาย และเปิดรหัสพนักงาน)",
+                sec2Title: "2. 入职渠道 (ช่องทางการสรรหา)",
+                sec3Title: "3. 有效账号 (จำนวนบัญชีใช้งานจริง)",
+                sec4Title: "4. 日度订单达成 (ยอดส่งพัสดุ POD)",
+                sec5Title: "5. 人员离职详细信息 (รายละเอียดพนักงานลาออก)",
+                sec6Title: "6. 日度网点巡查规划 (แผนงานการออกตรวจเยี่ยมสาขา)",
+                lblInv: "จำนวนผู้ติดต่อ/นัดหมาย (邀约人数)",
+                lblOpen: "จำนวนเปิดรหัสพนักงาน (开号人数)",
+                lblEff: "จำนวนบัญชีใช้งานจริง",
+                lblPod: "ยอดรวม POD (ชิ้น)",
+                lblResC: "จำนวนลาออก (คน)",
+                lblResD: "รายละเอียดและเหตุผล",
+                lblPlan: "แผนการออกตรวจเยี่ยมสาขาประจำวัน",
+                podHeading: "📦 บันทึกยอด POD รายบุคคล",
+                lblPodRec: "ชื่อผู้สรรหา",
+                thPodRec: "ผู้สรรหา",
+                summary6Title: "📋 สรุปผลรวมตัวเลขจาก 6 ข้อกำหนด (ย้อนหลังทั้งหมด)",
+                wpHeading: "📅 Work Plan (แผนการทำงานประจำวัน 6 แถว)",
+                thWpDate: "วันที่",
+                thWpDet: "รายละเอียดทั้ง 6 แถว"
+            },
+            zh: {
+                loginTitle: "KEX 招聘专员登录",
+                loginDesc: "请输入您的招聘专员姓名以登录系统 (输入 'แม่' 查看所有人的数据)",
+                loginLbl: "👤 招聘专员姓名 (Recruiter Name)",
+                loginBtn: "登录",
+                homeBtn: "🏠 首页",
+                logoutBtn: "退出",
+                hTitle: "👋 欢迎使用 KEX 招聘管理系统",
+                hDesc: "请选择下方菜单以管理数据、记录每日工作报告及查看统计信息。",
+                card1Title: "工作业绩概览与 POD 对比图",
+                card1Desc: "查看每日在岗人数与 POD 派送量的对比图表",
+                card2Title: "每日工作报告 (6项核心指标)",
+                card2Desc: "记录 6 项核心指标报告，支持一键复制发送至 Line 或下载 PDF",
+                card3Title: "配送员工数据库",
+                card3Desc: "管理员工名单、员工编号 (EMP_ID) 及入职渠道",
+                card4Title: "个人 POD 业绩记录",
+                card4Desc: "记录并管理每位员工的包裹派送数量",
+                card5Title: "Work Plan (6行工作计划)",
+                card5Desc: "管理记录今日主要工作、明日工作计划及其他事务（6行表单）",
+                card6Title: "离职数据分析",
+                card6Desc: "统计并分析各网点的员工离职原因与数据",
+                sec1Title: "1. 邀约人数，开号人数 (预约人数与开号人数)",
+                sec2Title: "2. 入职渠道 (员工入职渠道)",
+                sec3Title: "3. 有效账号 (有效账号数量)",
+                sec4Title: "4. 日度订单达成 (POD 派送单量达成)",
+                sec5Title: "5. 人员离职详细信息 (离职人员详细信息)",
+                sec6Title: "6. 日度网点巡查规划 (每日网点巡查规划)",
+                lblInv: "预约/邀约人数 (邀约人数)",
+                lblOpen: "开号人数 (开号人数)",
+                lblEff: "有效账号数量 (有效账号)",
+                lblPod: "POD 派送总量 (件)",
+                lblResC: "离职人数 (人)",
+                lblResD: "离职详细原因",
+                lblPlan: "每日网点巡查规划及安排",
+                podHeading: "📦 个人 POD 派送业绩记录",
+                lblPodRec: "招聘专员姓名",
+                thPodRec: "招聘专员",
+                summary6Title: "📋 6项核心指标数据汇总 (所有历史日报)",
+                wpHeading: "📅 Work Plan (工作计划 6行表单)",
+                thWpDate: "日期",
+                thWpDet: "6行工作详情汇总"
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'th' ? 'zh' : 'th';
+            localStorage.setItem('kex_lang', currentLang);
+            applyLanguage();
+        }
+
+        function applyLanguage() {
+            const t = translations[currentLang];
+            document.getElementById('l-title').innerText = t.loginTitle;
+            document.getElementById('l-desc').innerText = t.loginDesc;
+            document.getElementById('l-label').innerText = t.loginLbl;
+            document.getElementById('l-btn').innerText = t.loginBtn;
+            document.getElementById('nav-home-btn').innerText = t.homeBtn;
+            document.getElementById('logout-btn').innerText = t.logoutBtn;
+            document.getElementById('h-title').innerText = t.hTitle;
+            document.getElementById('h-desc').innerText = t.hDesc;
+            
+            document.getElementById('card-1-title').innerText = t.card1Title;
+            document.getElementById('card-1-desc').innerText = t.card1Desc;
+            document.getElementById('card-2-title').innerText = t.card2Title;
+            document.getElementById('card-2-desc').innerText = t.card2Desc;
+            document.getElementById('card-3-title').innerText = t.card3Title;
+            document.getElementById('card-3-desc').innerText = t.card3Desc;
+            document.getElementById('card-4-title').innerText = t.card4Title;
+            document.getElementById('card-4-desc').innerText = t.card4Desc;
+            document.getElementById('card-5-title').innerText = t.card5Title;
+            document.getElementById('card-5-desc').innerText = t.card5Desc;
+            document.getElementById('card-6-title').innerText = t.card6Title;
+            document.getElementById('card-6-desc').innerText = t.card6Desc;
+
+            document.getElementById('sec-1-title').innerText = t.sec1Title;
+            document.getElementById('sec-2-title').innerText = t.sec2Title;
+            document.getElementById('sec-3-title').innerText = t.sec3Title;
+            document.getElementById('sec-4-title').innerText = t.sec4Title;
+            document.getElementById('sec-5-title').innerText = t.sec5Title;
+            document.getElementById('sec-6-title').innerText = t.sec6Title;
+
+            document.getElementById('lbl-inv').innerText = t.lblInv;
+            document.getElementById('lbl-open').innerText = t.lblOpen;
+            document.getElementById('lbl-eff').innerText = t.lblEff;
+            document.getElementById('lbl-pod').innerText = t.lblPod;
+            document.getElementById('lbl-res-c').innerText = t.lblResC;
+            document.getElementById('lbl-res-d').innerText = t.lblResD;
+            document.getElementById('lbl-plan').innerText = t.lblPlan;
+
+            document.getElementById('pod-heading').innerText = t.podHeading;
+            document.getElementById('lbl-pod-rec').innerText = t.lblPodRec;
+            document.getElementById('th-pod-rec').innerText = t.thPodRec;
+            document.getElementById('summary-6-title').innerText = t.summary6Title;
+
+            document.getElementById('wp-heading').innerText = t.wpHeading;
+            document.getElementById('th-wp-date').innerText = t.thWpDate;
+            document.getElementById('th-wp-det').innerText = t.thWpDet;
+
+            document.getElementById('langSwitchBtn').innerText = currentLang === 'th' ? '🌐 ไทย / 中文' : '🌐 中文 / ไทย';
+        }
+
+        const loginModal = document.getElementById('loginModal');
+        const loginForm = document.getElementById('loginForm');
+        const inputRecruiterName = document.getElementById('inputRecruiterName');
+        const currentRecruiterDisplay = document.getElementById('currentRecruiterDisplay');
+
+        const reportForm = document.getElementById('reportForm');
+        const tableBody = document.getElementById('reportTableBody');
+        const employeeForm = document.getElementById('employeeForm');
+        const employeeTableBody = document.getElementById('employeeTableBody');
+        const podForm = document.getElementById('podForm');
+        const podTableBody = document.getElementById('podTableBody');
+        const workPlanForm = document.getElementById('workPlanForm');
+        const workPlanTableBody = document.getElementById('workPlanTableBody');
+
+        function checkLoginState() {
+            applyLanguage();
+            if (!currentRecruiter) {
+                loginModal.classList.remove('hidden');
+            } else {
+                loginModal.classList.add('hidden');
+                currentRecruiterDisplay.innerText = currentRecruiter === 'แม่' ? `ผู้ใช้งาน: แม่ (ผู้ดูแลระบบกลาง)` : `ผู้ใช้งาน: ${currentRecruiter}`;
+                document.getElementById('reportName').value = currentRecruiter === 'แม่' ? 'แม่' : currentRecruiter;
+                document.getElementById('podRecruiter').value = currentRecruiter === 'แม่' ? 'แม่' : currentRecruiter;
+                loadUserData();
+            }
+        }
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = inputRecruiterName.value.trim();
+            if (name) {
+                currentRecruiter = name;
+                localStorage.setItem('kex_active_recruiter', currentRecruiter);
+                checkLoginState();
+            }
+        });
+
+        function logout() {
+            if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
+                localStorage.removeItem('kex_active_recruiter');
+                currentRecruiter = '';
+                checkLoginState();
+            }
+        }
+
+        function loadUserData() {
+            reports = [];
+            employees = [];
+            podRecords = [];
+            workPlans = [];
+
+            if (currentRecruiter === 'แม่') {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.includes('reports_v12')) reports = reports.concat(JSON.parse(localStorage.getItem(key)) || []);
+                    if (key.includes('employees_v7')) employees = employees.concat(JSON.parse(localStorage.getItem(key)) || []);
+                    if (key.includes('podRecords_v2')) podRecords = podRecords.concat(JSON.parse(localStorage.getItem(key)) || []);
+                    if (key.includes('workPlans_v3')) workPlans = workPlans.concat(JSON.parse(localStorage.getItem(key)) || []);
+                }
+                reports = Array.from(new Set(reports.map(JSON.stringify))).map(JSON.parse);
+                employees = Array.from(new Set(employees.map(JSON.stringify))).map(JSON.parse);
+                podRecords = Array.from(new Set(podRecords.map(JSON.stringify))).map(JSON.parse);
+                workPlans = Array.from(new Set(workPlans.map(JSON.stringify))).map(JSON.parse);
+            } else {
+                const prefix = `kex_${currentRecruiter}_`;
+                reports = JSON.parse(localStorage.getItem(prefix + 'reports_v12')) || [];
+                employees = JSON.parse(localStorage.getItem(prefix + 'employees_v7')) || [];
+                podRecords = JSON.parse(localStorage.getItem(prefix + 'podRecords_v2')) || [];
+                workPlans = JSON.parse(localStorage.getItem(prefix + 'workPlans_v3')) || [];
+            }
+
+            setDefaultDate();
+            setPodDefaultDate();
+            setWpDefaultDate();
+            renderUI();
+            renderEmployeeUI();
+            renderPodUI();
+            renderWorkPlanUI();
+            updateOverview();
+        }
+
+        function saveUserData() {
+            const activeKey = currentRecruiter === 'แม่' ? 'เพลง' : currentRecruiter;
+            const prefix = `kex_${activeKey}_`;
+            
+            localStorage.setItem(prefix + 'reports_v12', JSON.stringify(reports));
+            localStorage.setItem(prefix + 'employees_v7', JSON.stringify(employees));
+            localStorage.setItem(prefix + 'podRecords_v2', JSON.stringify(podRecords));
+            localStorage.setItem(prefix + 'workPlans_v3', JSON.stringify(workPlans));
+        }
+
+        function goHome() {
+            document.querySelectorAll('.view-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('view-home').classList.remove('hidden');
+        }
+
+        function switchView(viewName) {
+            document.getElementById('view-home').classList.add('hidden');
+            document.querySelectorAll('.view-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('view-' + viewName).classList.remove('hidden');
+
+            if (viewName === 'overview') updateOverview();
+            if (viewName === 'employees') renderEmployeeUI();
+            if (viewName === 'pod') {
+                renderPodUI();
+                document.getElementById('podRecruiter').value = currentRecruiter === 'แม่' ? 'แม่' : currentRecruiter;
+            }
+            if (viewName === 'workplan') renderWorkPlanUI();
+            if (viewName === 'resignation') updateResignationAnalysis();
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const clockEl = document.getElementById('currentDateTime');
+            if (clockEl) clockEl.innerText = now.toLocaleDateString('th-TH', options);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        function renderUI() {
+            tableBody.innerHTML = '';
+            document.getElementById('recordCount').innerText = `ทั้งหมด ${reports.length} รายการ`;
+
+            if (reports.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-400">ยังไม่มีข้อมูลรายงานในระบบ</td></tr>`;
+                return;
+            }
+
+            reports.forEach((r, index) => {
+                tableBody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="p-3 align-top">
+                            <div class="font-semibold text-gray-900">${r.date}</div>
+                            <span class="text-[11px] text-orange-700 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded-md inline-block mt-1 font-medium">${r.name} (${r.empId})</span>
+                        </td>
+                        <td class="p-3 align-top text-xs text-gray-700">
+                            <div>นัดหมาย: <b>${r.inviteCount || 0}</b></div>
+                            <div class="text-emerald-700 mt-0.5">เปิดรหัส: <b>${r.openCodeCount || 0}</b></div>
+                        </td>
+                        <td class="p-3 align-top text-xs text-gray-700">
+                            <div>สาขา: ${r.ch_kex_branch || 0} | TA: ${r.ch_ta || 0}</div>
+                            <div>ค่ายอื่น: ${r.ch_other_camp || 0} | Online: ${r.ch_online || 0}</div>
+                        </td>
+                        <td class="p-3 align-top text-xs text-gray-700">
+                            <div>บัญชี: <b>${r.effectiveAccounts || 0}</b></div>
+                            <div class="text-orange-600 font-bold mt-0.5">POD: ${Number(r.dailyOrders || 0).toLocaleString()}</div>
+                        </td>
+                        <td class="p-3 align-top text-xs text-gray-700">
+                            <div class="text-rose-600 font-bold">ลาออก: ${r.resignedCount || 0}</div>
+                            <div class="text-gray-500 mt-0.5 truncate max-w-[150px]"><b>แผน:</b> ${r.siteInspectionPlan || '-'}</div>
+                        </td>
+                        <td class="p-3 align-top text-center">
+                            <button onclick="deleteReport(${index})" class="text-rose-500 bg-rose-50 p-1.5 rounded-lg text-xs cursor-pointer">ลบ</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        reportForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            reports.unshift({
+                empId: document.getElementById('reportEmpId').value,
+                name: document.getElementById('reportName').value,
+                date: document.getElementById('reportDate').value,
+                branchKex: document.getElementById('branchKex').value,
+                workingHours: document.getElementById('workingHours').value,
+                inviteCount: document.getElementById('inviteCount').value,
+                openCodeCount: document.getElementById('openCodeCount').value,
+                ch_kex_branch: document.getElementById('ch_kex_branch').value || 0,
+                ch_ta: document.getElementById('ch_ta').value || 0,
+                ch_other_camp: document.getElementById('ch_other_camp').value || 0,
+                ch_online: document.getElementById('ch_online').value || 0,
+                ch_others: document.getElementById('ch_others').value || 0,
+                effectiveAccounts: document.getElementById('effectiveAccounts').value,
+                dailyOrders: document.getElementById('dailyOrders').value,
+                resignedCount: document.getElementById('resignedCount').value,
+                resignationDetail: document.getElementById('resignationDetail').value,
+                siteInspectionPlan: document.getElementById('siteInspectionPlan').value
+            });
+
+            saveUserData();
+            renderUI();
+            updateOverview();
+            alert('บันทึก Daily Report สำเร็จ!');
+        });
+
+        function deleteReport(index) {
+            if (confirm('คุณต้องการลบรายงานนี้ใช่หรือไม่?')) {
+                reports.splice(index, 1);
+                saveUserData();
+                renderUI();
+                updateOverview();
+            }
+        }
+
+        function copyDailyReport() {
+            if (reports.length === 0) {
+                alert('ยังไม่มีข้อมูลรายงานในระบบ');
+                return;
+            }
+            const r = reports[0];
+            let text = `📋 KEX Daily Report
+Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branchKex}
+
+1. 邀约人数，开号人数: นัดหมาย ${r.inviteCount || 0} คน / เปิดรหัส ${r.openCodeCount || 0} คน
+2. 入职渠道: 
+- สาขาKexแนะนำ: ${r.ch_kex_branch}
+- TA Kex แนะนำ: ${r.ch_ta}
+- ค่ายอื่น: ${r.ch_other_camp}
+- Online: ${r.ch_online}
+- อื่นๆ: ${r.ch_others}
+3. 有效账号: บัญชีใช้งานจริง ${r.effectiveAccounts || 0} คน
+4. 日度订单达成: ยอดส่ง POD รวม ${Number(r.dailyOrders || 0).toLocaleString()} ชิ้น
+5. 人员离职详细信息: ลาออก ${r.resignedCount || 0} คน (${r.resignationDetail || 'ไม่มี'})
+6. 日度网点巡查规划: ${r.siteInspectionPlan || 'ไม่มี'}`;
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert('คัดลอก Daily Report เรียบร้อยแล้ว!');
+            });
+        }
+
+        function downloadPDF() { window.print(); }
+
+        function renderEmployeeUI() {
+            employeeTableBody.innerHTML = '';
+            document.getElementById('employeeRecordCount').innerText = `${employees.length} คน`;
+            if (employees.length === 0) {
+                employeeTableBody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-gray-400">ไม่พบข้อมูลพนักงาน</td></tr>`;
+                return;
+            }
+            employees.forEach((emp, index) => {
+                employeeTableBody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="p-3 font-semibold">${emp.empId}</td>
+                        <td class="p-3 font-medium text-gray-900">${emp.staffName}</td>
+                        <td class="p-3">${emp.station}</td>
+                        <td class="p-3"><span class="bg-gray-100 text-[10px] px-2 py-0.5 rounded">${emp.type}</span></td>
+                        <td class="p-3"><span class="bg-orange-50 text-orange-700 text-[10px] px-2 py-0.5 rounded">${emp.channel || '-'}</span></td>
+                        <td class="p-3"><span class="${emp.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'} text-[10px] px-2 py-0.5 rounded-full font-medium">${emp.status}</span></td>
+                        <td class="p-3 text-center"><button onclick="deleteEmployee(${index})" class="text-rose-500 bg-rose-50 p-1.5 rounded-lg text-xs cursor-pointer">ลบ</button></td>
+                    </tr>`;
+            });
+        }
+
+        employeeForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            employees.unshift({
+                empId: document.getElementById('empId').value,
+                staffName: document.getElementById('empName').value,
+                station: document.getElementById('empStation').value,
+                type: document.getElementById('empType').value,
+                channel: document.getElementById('empChannel').value,
+                status: document.getElementById('empStatus').value
+            });
+            saveUserData();
+            renderEmployeeUI();
+            employeeForm.reset();
+            alert('เพิ่มพนักงานสำเร็จ!');
+        });
+
+        function deleteEmployee(index) {
+            if (confirm('ลบพนักงานคนนี้ใช่หรือไม่?')) {
+                employees.splice(index, 1);
+                saveUserData();
+                renderEmployeeUI();
+            }
+        }
+
+        function renderPodUI() {
+            podTableBody.innerHTML = '';
+            document.getElementById('podRecordCount').innerText = `${podRecords.length} รายการ`;
+            if (podRecords.length === 0) {
+                podTableBody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-gray-400">ยังไม่มีข้อมูลยอด POD</td></tr>`;
+                return;
+            }
+            podRecords.forEach((p, index) => {
+                podTableBody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="p-3 font-medium">${p.date}</td>
+                        <td class="p-3">${p.empId}</td>
+                        <td class="p-3 font-semibold text-gray-900">${p.staffName}</td>
+                        <td class="p-3">${p.station}</td>
+                        <td class="p-3 font-bold text-orange-600">${Number(p.podValue).toLocaleString()}</td>
+                        <td class="p-3"><span class="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded">${p.recruiter || '-'}</span></td>
+                        <td class="p-3 text-center"><button onclick="deletePodRecord(${index})" class="text-rose-500 bg-rose-50 p-1.5 rounded-lg text-xs cursor-pointer">ลบ</button></td>
+                    </tr>`;
+            });
+        }
+
+        podForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            podRecords.unshift({
+                date: document.getElementById('podDate').value,
+                empId: document.getElementById('podEmpId').value,
+                staffName: document.getElementById('podStaffName').value,
+                station: document.getElementById('podStation').value,
+                podValue: document.getElementById('podValue').value,
+                recruiter: document.getElementById('podRecruiter').value
+            });
+            saveUserData();
+            renderPodUI();
+            podForm.reset();
+            setPodDefaultDate();
+            document.getElementById('podRecruiter').value = currentRecruiter === 'แม่' ? 'แม่' : currentRecruiter;
+            alert('บันทึกยอด POD สำเร็จ!');
+        });
+
+        function deletePodRecord(index) {
+            if (confirm('ลบรายการนี้ใช่หรือไม่?')) {
+                podRecords.splice(index, 1);
+                saveUserData();
+                renderPodUI();
+            }
+        }
+
+        // --- Work Plan 6 Rows Functions ---
+        function renderWorkPlanUI() {
+            workPlanTableBody.innerHTML = '';
+            document.getElementById('wpRecordCount').innerText = `${workPlans.length} รายการ`;
+            if (workPlans.length === 0) {
+                workPlanTableBody.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-gray-400">ยังไม่มีข้อมูล Work Plan</td></tr>`;
+                return;
+            }
+            workPlans.forEach((wp, index) => {
+                let detailsHtml = wp.rows.map(r => r.detail ? `<div class="text-xs text-gray-700">• [No.${r.no}] ${r.detail} (${r.hour} ชม.)</div>` : '').join('');
+                workPlanTableBody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="p-3 font-medium align-top">${wp.date}</td>
+                        <td class="p-3 align-top space-y-1">${detailsHtml || '<span class="text-gray-400">ไม่มีรายละเอียด</span>'}</td>
+                        <td class="p-3 align-top text-center"><button onclick="deleteWorkPlan(${index})" class="text-rose-500 bg-rose-50 p-1.5 rounded-lg text-xs cursor-pointer">ลบ</button></td>
+                    </tr>`;
+            });
+        }
+
+        workPlanForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            let rows = [];
+            for (let i = 1; i <= 6; i++) {
+                rows.push({
+                    no: i,
+                    detail: document.getElementById(`det_${i}`).value.trim(),
+                    hour: document.getElementById(`hr_${i}`).value || 0
+                });
+            }
+
+            workPlans.unshift({
+                date: document.getElementById('wpDate').value,
+                rows: rows
+            });
+
+            saveUserData();
+            renderWorkPlanUI();
+            
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById(`det_${i}`).value = '';
+                document.getElementById(`hr_${i}`).value = i === 1 ? '8' : '0';
+            }
+            setWpDefaultDate();
+            alert('บันทึก Work Plan สำเร็จ!');
+        });
+
+        function deleteWorkPlan(index) {
+            if (confirm('ลบรายการแผนงานนี้ใช่หรือไม่?')) {
+                workPlans.splice(index, 1);
+                saveUserData();
+                renderWorkPlanUI();
+            }
+        }
+
+        function updateOverview() {
+            let sumInvite = 0, sumOpen = 0, sumChannel = 0, sumEffective = 0, sumOrders = 0, sumResignedRep = 0;
+
+            reports.forEach(r => {
+                sumInvite += Number(r.inviteCount || 0);
+                sumOpen += Number(r.openCodeCount || 0);
+                sumChannel += Number(r.ch_kex_branch || 0) + Number(r.ch_ta || 0) + Number(r.ch_other_camp || 0) + Number(r.ch_online || 0) + Number(r.ch_others || 0);
+                sumEffective += Number(r.effectiveAccounts || 0);
+                sumOrders += Number(r.dailyOrders || 0);
+                sumResignedRep += Number(r.resignedCount || 0);
+            });
+
+            document.getElementById('sum-invite').innerText = sumInvite.toLocaleString();
+            document.getElementById('sum-open').innerText = sumOpen.toLocaleString();
+            document.getElementById('sum-channel').innerText = sumChannel.toLocaleString();
+            document.getElementById('sum-effective').innerText = sumEffective.toLocaleString();
+            document.getElementById('sum-orders').innerText = sumOrders.toLocaleString();
+            document.getElementById('sum-resigned').innerText = sumResignedRep.toLocaleString();
+
+            renderDualChart();
+        }
+
+        function renderDualChart() {
+            const dateSet = new Set();
+            reports.forEach(r => dateSet.add(r.date));
+            podRecords.forEach(p => dateSet.add(p.date));
+            const sortedDates = Array.from(dateSet).sort();
+
+            const podMap = {};
+            reports.forEach(r => { podMap[r.date] = Number(r.dailyOrders || 0); });
+            podRecords.forEach(p => {
+                if (!podMap[p.date]) podMap[p.date] = 0;
+                podMap[p.date] += Number(p.podValue || 0);
+            });
+
+            const attendMap = {};
+            reports.forEach(r => { attendMap[r.date] = Number(r.effectiveAccounts || 0); });
+
+            const podData = sortedDates.map(d => podMap[d] || 0);
+            const attendData = sortedDates.map(d => attendMap[d] || 0);
+
+            const ctx = document.getElementById('dualChart').getContext('2d');
+            if (dualChartInstance) dualChartInstance.destroy();
+
+            dualChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedDates.length > 0 ? sortedDates : ['ยังไม่มีข้อมูล'],
+                    datasets: [
+                        { type: 'bar', label: 'ยอด POD (ชิ้น)', data: sortedDates.length > 0 ? podData : [0], backgroundColor: 'rgba(234, 88, 12, 0.7)', borderColor: 'rgb(194, 65, 12)', borderWidth: 1, borderRadius: 6, yAxisID: 'y' },
+                        { type: 'line', label: 'บัญชีใช้งาน (คน)', data: sortedDates.length > 0 ? attendData : [0], backgroundColor: 'rgba(16, 185, 129, 1)', borderColor: 'rgb(16, 185, 129)', borderWidth: 2, tension: 0.1, yAxisID: 'y1' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { type: 'linear', position: 'left', beginAtZero: true },
+                        y1: { type: 'linear', position: 'right', grid: { display: false }, beginAtZero: true },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: { legend: { position: 'top' } }
+                }
+            });
+        }
+
+        function updateResignationAnalysis() {
+            const container = document.getElementById('resignationListContainer');
+            container.innerHTML = '';
+            const resignedReports = reports.filter(r => Number(r.resignedCount) > 0);
+            if (resignedReports.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-sm">ยังไม่มีบันทึกข้อมูลการลาออก</p>`;
+                return;
+            }
+            resignedReports.forEach(r => {
+                container.innerHTML += `
+                    <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl">
+                        <div class="flex justify-between text-xs font-semibold text-gray-800"><span>${r.branchKex}</span><span class="text-gray-400">${r.date}</span></div>
+                        <p class="text-xs text-rose-600 font-medium mt-1">ลาออก: ${r.resignedCount} คน</p>
+                        <p class="text-xs text-gray-600 mt-0.5"><b>รายละเอียด:</b> ${r.resignationDetail || '-'}</p>
+                    </div>`;
+            });
+        }
+
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            const dateEl = document.getElementById('reportDate');
+            if (dateEl) dateEl.value = today;
+        }
+
+        function setPodDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            const podDateEl = document.getElementById('podDate');
+            if (podDateEl) podDateEl.value = today;
+        }
+
+        function setWpDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            const wpDateEl = document.getElementById('wpDate');
+            if (wpDateEl) wpDateEl.value = today;
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reports, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `kex_daily_report_${currentRecruiter}.json`);
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+        }
+
+        checkLoginState();
+    </script>
+</body>
+</html>

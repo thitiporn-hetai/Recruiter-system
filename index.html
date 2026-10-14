@@ -321,15 +321,17 @@
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mt-6 no-print">
                 <div class="p-4 border-b border-gray-200 font-bold text-gray-800 text-xs sm:text-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <span id="hist-title">📋 ประวัติรายงานย้อนหลัง</span>
-                    <div class="flex items-center gap-3">
+                    <div class="flex flex-wrap items-center gap-2">
                         <span id="recordCount" class="text-xs text-gray-500 font-normal">ทั้งหมด 0 รายการ</span>
-                        <button onclick="clearAllReports()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-medium px-3 py-1.5 rounded-lg transition cursor-pointer border border-rose-200">🗑️ ลบประวัติรายงานทั้งหมด</button>
+                        <button onclick="deleteSelectedReports()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-medium px-3 py-1.5 rounded-lg transition cursor-pointer border border-rose-200">🗑️ ลบรายการที่เลือก</button>
+                        <button onclick="clearAllReports()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-3 py-1.5 rounded-lg transition cursor-pointer border border-gray-300">ลบทั้งหมด</button>
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-[650px]">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead>
                             <tr class="bg-gray-50 text-gray-500 text-[11px] uppercase tracking-wider border-b border-gray-200">
+                                <th class="p-3 w-10 text-center"><input type="checkbox" id="selectAllReports" onclick="toggleSelectAll('report', this)" class="rounded border-gray-300"></th>
                                 <th class="p-3" id="th-date">วันที่ / ผู้บันทึก</th>
                                 <th class="p-3" id="th-inv">1. 邀约/开号</th>
                                 <th class="p-3" id="th-ch">2. 入职渠道</th>
@@ -370,13 +372,23 @@
                         <span id="emp-list-title">รายชื่อพนักงาน</span>
                         <div class="flex items-center gap-3">
                             <span id="employeeRecordCount" class="font-normal">0 คน</span>
-                            <button onclick="clearAllEmployees()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-medium px-3 py-1 rounded transition cursor-pointer border border-rose-200">🗑️ ลบรายชื่อทั้งหมด</button>
+                            <button onclick="deleteSelectedEmployees()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-medium px-3 py-1 rounded transition cursor-pointer border border-rose-200">🗑️ ลบที่เลือก</button>
+                            <button onclick="clearAllEmployees()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-3 py-1 rounded transition cursor-pointer border border-gray-300">ลบทั้งหมด</button>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs sm:text-sm min-w-[600px]">
+                        <table class="w-full text-left text-xs sm:text-sm min-w-[650px]">
                             <thead class="bg-gray-100 border-b text-gray-600 text-[11px] uppercase">
-                                <tr><th class="p-3">EMP_ID</th><th class="p-3" id="th-emp-name">ชื่อ</th><th class="p-3">Station</th><th class="p-3" id="th-emp-type">ประเภท</th><th class="p-3" id="th-emp-ch">ช่องทาง</th><th class="p-3" id="th-emp-stat">สถานะ</th><th class="p-3 text-center" id="th-emp-mng">จัดการ</th></tr>
+                                <tr>
+                                    <th class="p-3 w-10 text-center"><input type="checkbox" id="selectAllEmployees" onclick="toggleSelectAll('employee', this)" class="rounded border-gray-300"></th>
+                                    <th class="p-3">EMP_ID</th>
+                                    <th class="p-3" id="th-emp-name">ชื่อ</th>
+                                    <th class="p-3">Station</th>
+                                    <th class="p-3" id="th-emp-type">ประเภท</th>
+                                    <th class="p-3" id="th-emp-ch">ช่องทาง</th>
+                                    <th class="p-3" id="th-emp-stat">สถานะ</th>
+                                    <th class="p-3 text-center" id="th-emp-mng">จัดการ</th>
+                                </tr>
                             </thead>
                             <tbody id="employeeTableBody" class="divide-y text-gray-700"></tbody>
                         </table>
@@ -411,13 +423,23 @@
                         <span id="pod-list-title">รายการ POD</span>
                         <div class="flex items-center gap-3">
                             <span id="podRecordCount" class="font-normal">0 รายการ</span>
-                            <button onclick="clearAllPods()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-medium px-3 py-1 rounded transition cursor-pointer border border-rose-200">🗑️ ลบประวัติ POD ทั้งหมด</button>
+                            <button onclick="deleteSelectedPods()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-medium px-3 py-1 rounded transition cursor-pointer border border-rose-200">🗑️ ลบที่เลือก</button>
+                            <button onclick="clearAllPods()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-3 py-1 rounded transition cursor-pointer border border-gray-300">ลบทั้งหมด</button>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs sm:text-sm min-w-[550px]">
+                        <table class="w-full text-left text-xs sm:text-sm min-w-[600px]">
                             <thead class="bg-gray-100 border-b text-gray-600 text-[11px] uppercase">
-                                <tr><th class="p-3" id="th-pod-date">วันที่</th><th class="p-3">Emp_ID</th><th class="p-3" id="th-pod-name">ชื่อ</th><th class="p-3">Station</th><th class="p-3" id="th-pod-val">ยอด POD</th><th class="p-3" id="th-pod-rec">ผู้สรรหา</th><th class="p-3 text-center" id="th-pod-mng">จัดการ</th></tr>
+                                <tr>
+                                    <th class="p-3 w-10 text-center"><input type="checkbox" id="selectAllPods" onclick="toggleSelectAll('pod', this)" class="rounded border-gray-300"></th>
+                                    <th class="p-3" id="th-pod-date">วันที่</th>
+                                    <th class="p-3">Emp_ID</th>
+                                    <th class="p-3" id="th-pod-name">ชื่อ</th>
+                                    <th class="p-3">Station</th>
+                                    <th class="p-3" id="th-pod-val">ยอด POD</th>
+                                    <th class="p-3" id="th-pod-rec">ผู้สรรหา</th>
+                                    <th class="p-3 text-center" id="th-pod-mng">จัดการ</th>
+                                </tr>
                             </thead>
                             <tbody id="podTableBody" class="divide-y text-gray-700"></tbody>
                         </table>
@@ -489,13 +511,19 @@
                         <span id="wp-list-title">ประวัติ Work Plan ย้อนหลัง</span>
                         <div class="flex items-center gap-3">
                             <span id="wpRecordCount" class="font-normal">0 รายการ</span>
-                            <button onclick="clearAllWorkPlans()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-medium px-3 py-1 rounded transition cursor-pointer border border-rose-200">🗑️ ลบประวัติ Work Plan ทั้งหมด</button>
+                            <button onclick="deleteSelectedWorkPlans()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-medium px-3 py-1 rounded transition cursor-pointer border border-rose-200">🗑️ ลบที่เลือก</button>
+                            <button onclick="clearAllWorkPlans()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-3 py-1 rounded transition cursor-pointer border border-gray-300">ลบทั้งหมด</button>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs sm:text-sm min-w-[500px]">
+                        <table class="w-full text-left text-xs sm:text-sm min-w-[550px]">
                             <thead class="bg-gray-100 border-b text-gray-600 text-[11px] uppercase">
-                                <tr><th class="p-3" id="th-wp-date">วันที่</th><th class="p-3" id="th-wp-det">รายละเอียดทั้ง 6 แถว</th><th class="p-3 text-center" id="th-wp-mng">จัดการ</th></tr>
+                                <tr>
+                                    <th class="p-3 w-10 text-center"><input type="checkbox" id="selectAllWorkPlans" onclick="toggleSelectAll('workplan', this)" class="rounded border-gray-300"></th>
+                                    <th class="p-3" id="th-wp-date">วันที่</th>
+                                    <th class="p-3" id="th-wp-det">รายละเอียดทั้ง 6 แถว</th>
+                                    <th class="p-3 text-center" id="th-wp-mng">จัดการ</th>
+                                </tr>
                             </thead>
                             <tbody id="workPlanTableBody" class="divide-y text-gray-700"></tbody>
                         </table>
@@ -803,18 +831,26 @@
         setInterval(updateClock, 1000);
         updateClock();
 
+        function toggleSelectAll(type, masterCheckbox) {
+            const checkboxes = document.querySelectorAll(`.${type}-checkbox`);
+            checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
+        }
+
+        // --- Daily Reports ---
         function renderUI() {
             tableBody.innerHTML = '';
             document.getElementById('recordCount').innerText = `ทั้งหมด ${reports.length} รายการ`;
+            document.getElementById('selectAllReports').checked = false;
 
             if (reports.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-400">ยังไม่มีข้อมูลรายงานในระบบ</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-gray-400">ยังไม่มีข้อมูลรายงานในระบบ</td></tr>`;
                 return;
             }
 
             reports.forEach((r, index) => {
                 tableBody.innerHTML += `
                     <tr class="hover:bg-gray-50 transition">
+                        <td class="p-3 text-center align-top"><input type="checkbox" value="${index}" class="report-checkbox rounded border-gray-300"></td>
                         <td class="p-3 align-top">
                             <div class="font-semibold text-gray-900">${r.date}</div>
                             <span class="text-[11px] text-orange-700 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded-md inline-block mt-1 font-medium">${r.name} (${r.empId})</span>
@@ -836,7 +872,10 @@
                             <div class="text-gray-500 mt-0.5 truncate max-w-[150px]"><b>แผน:</b> ${r.siteInspectionPlan || '-'}</div>
                         </td>
                         <td class="p-3 align-top text-center">
-                            <button onclick="deleteReport(${index})" class="text-rose-600 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition">🗑️ ลบ</button>
+                            <div class="flex items-center justify-center gap-1.5">
+                                <button onclick="editReport(${index})" title="แก้ไข" class="text-blue-600 hover:bg-blue-50 p-1.5 rounded-lg text-xs cursor-pointer transition">✏️</button>
+                                <button onclick="deleteReport(${index})" title="ลบ" class="text-red-500 hover:bg-red-50 p-1.5 rounded-lg text-xs cursor-pointer transition">🗑️</button>
+                            </div>
                         </td>
                     </tr>`;
             });
@@ -876,6 +915,34 @@
             document.getElementById('reportName').value = currentRecruiter === 'แม่' ? 'แม่' : currentRecruiter;
         }
 
+        function editReport(index) {
+            const r = reports[index];
+            document.getElementById('reportEmpId').value = r.empId;
+            document.getElementById('reportName').value = r.name;
+            document.getElementById('reportDate').value = r.date;
+            document.getElementById('branchKex').value = r.branchKex;
+            document.getElementById('workingHours').value = r.workingHours;
+            document.getElementById('inviteCount').value = r.inviteCount;
+            document.getElementById('openCodeCount').value = r.openCodeCount;
+            document.getElementById('ch_kex_branch').value = r.ch_kex_branch;
+            document.getElementById('ch_ta').value = r.ch_ta;
+            document.getElementById('ch_other_camp').value = r.ch_other_camp;
+            document.getElementById('ch_online').value = r.ch_online;
+            document.getElementById('ch_others').value = r.ch_others;
+            document.getElementById('effectiveAccounts').value = r.effectiveAccounts;
+            document.getElementById('dailyOrders').value = r.dailyOrders;
+            document.getElementById('resignedCount').value = r.resignedCount;
+            document.getElementById('resignationDetail').value = r.resignationDetail;
+            document.getElementById('siteInspectionPlan').value = r.siteInspectionPlan;
+
+            reports.splice(index, 1);
+            saveUserData();
+            renderUI();
+            updateOverview();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            alert('โหลดข้อมูลลงฟอร์มเพื่อแก้ไขแล้วครับ');
+        }
+
         function deleteReport(index) {
             if (confirm('คุณต้องการลบรายงานรายการนี้ใช่หรือไม่?')) {
                 reports.splice(index, 1);
@@ -885,8 +952,24 @@
             }
         }
 
+        function deleteSelectedReports() {
+            const selected = document.querySelectorAll('.report-checkbox:checked');
+            if (selected.length === 0) {
+                alert('กรุณาติ๊กเลือกรายการที่ต้องการลบอย่างน้อย 1 รายการ');
+                return;
+            }
+            if (confirm(`คุณต้องการลบรายงาน ${selected.length} รายการที่เลือกใช่หรือไม่?`)) {
+                const indexesToRemove = Array.from(selected).map(cb => parseInt(cb.value));
+                reports = reports.filter((_, idx) => !indexesToRemove.includes(idx));
+                saveUserData();
+                renderUI();
+                updateOverview();
+                alert('ลบรายการที่เลือกเรียบร้อยแล้ว');
+            }
+        }
+
         function clearAllReports() {
-            if (confirm('⚠️ คำเตือน: คุณต้องการลบประวัติรายงานทั้งหมดใช่หรือไม่? (ไม่สามารถกู้คืนได้)')) {
+            if (confirm('⚠️ คำเตือน: คุณต้องการลบประวัติรายงานทั้งหมดใช่หรือไม่?')) {
                 reports = [];
                 saveUserData();
                 renderUI();
@@ -923,23 +1006,32 @@ Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branc
 
         function downloadPDF() { window.print(); }
 
+        // --- Employees ---
         function renderEmployeeUI() {
             employeeTableBody.innerHTML = '';
             document.getElementById('employeeRecordCount').innerText = `${employees.length} คน`;
+            document.getElementById('selectAllEmployees').checked = false;
+
             if (employees.length === 0) {
-                employeeTableBody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-gray-400">ไม่พบข้อมูลพนักงาน</td></tr>`;
+                employeeTableBody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-gray-400">ไม่พบข้อมูลพนักงาน</td></tr>`;
                 return;
             }
             employees.forEach((emp, index) => {
                 employeeTableBody.innerHTML += `
                     <tr class="hover:bg-gray-50 transition">
+                        <td class="p-3 text-center"><input type="checkbox" value="${index}" class="employee-checkbox rounded border-gray-300"></td>
                         <td class="p-3 font-semibold">${emp.empId}</td>
                         <td class="p-3 font-medium text-gray-900">${emp.staffName}</td>
                         <td class="p-3">${emp.station}</td>
                         <td class="p-3"><span class="bg-gray-100 text-[10px] px-2 py-0.5 rounded">${emp.type}</span></td>
                         <td class="p-3"><span class="bg-orange-50 text-orange-700 text-[10px] px-2 py-0.5 rounded">${emp.channel || '-'}</span></td>
                         <td class="p-3"><span class="${emp.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'} text-[10px] px-2 py-0.5 rounded-full font-medium">${emp.status}</span></td>
-                        <td class="p-3 text-center"><button onclick="deleteEmployee(${index})" class="text-rose-600 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition">🗑️ ลบ</button></td>
+                        <td class="p-3 text-center">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <button onclick="editEmployee(${index})" title="แก้ไข" class="text-blue-600 hover:bg-blue-50 p-1.5 rounded-lg text-xs cursor-pointer transition">✏️</button>
+                                <button onclick="deleteEmployee(${index})" title="ลบ" class="text-red-500 hover:bg-red-50 p-1.5 rounded-lg text-xs cursor-pointer transition">🗑️</button>
+                            </div>
+                        </td>
                     </tr>`;
             });
         }
@@ -960,11 +1052,42 @@ Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branc
             alert('เพิ่มพนักงานสำเร็จ!');
         });
 
+        function editEmployee(index) {
+            const emp = employees[index];
+            document.getElementById('empId').value = emp.empId;
+            document.getElementById('empName').value = emp.staffName;
+            document.getElementById('empStation').value = emp.station;
+            document.getElementById('empType').value = emp.type;
+            document.getElementById('empChannel').value = emp.channel;
+            document.getElementById('empStatus').value = emp.status;
+
+            employees.splice(index, 1);
+            saveUserData();
+            renderEmployeeUI();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            alert('โหลดข้อมูลพนักงานลงฟอร์มเพื่อแก้ไขแล้วครับ');
+        }
+
         function deleteEmployee(index) {
             if (confirm('ลบพนักงานคนนี้ใช่หรือไม่?')) {
                 employees.splice(index, 1);
                 saveUserData();
                 renderEmployeeUI();
+            }
+        }
+
+        function deleteSelectedEmployees() {
+            const selected = document.querySelectorAll('.employee-checkbox:checked');
+            if (selected.length === 0) {
+                alert('กรุณาติ๊กเลือกพนักงานที่ต้องการลบอย่างน้อย 1 คน');
+                return;
+            }
+            if (confirm(`คุณต้องการลบพนักงาน ${selected.length} คนที่เลือกใช่หรือไม่?`)) {
+                const indexesToRemove = Array.from(selected).map(cb => parseInt(cb.value));
+                employees = employees.filter((_, idx) => !indexesToRemove.includes(idx));
+                saveUserData();
+                renderEmployeeUI();
+                alert('ลบพนักงานที่เลือกเรียบร้อยแล้ว');
             }
         }
 
@@ -977,23 +1100,32 @@ Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branc
             }
         }
 
+        // --- POD Records ---
         function renderPodUI() {
             podTableBody.innerHTML = '';
             document.getElementById('podRecordCount').innerText = `${podRecords.length} รายการ`;
+            document.getElementById('selectAllPods').checked = false;
+
             if (podRecords.length === 0) {
-                podTableBody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-gray-400">ยังไม่มีข้อมูลยอด POD</td></tr>`;
+                podTableBody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-gray-400">ยังไม่มีข้อมูลยอด POD</td></tr>`;
                 return;
             }
             podRecords.forEach((p, index) => {
                 podTableBody.innerHTML += `
                     <tr class="hover:bg-gray-50 transition">
+                        <td class="p-3 text-center"><input type="checkbox" value="${index}" class="pod-checkbox rounded border-gray-300"></td>
                         <td class="p-3 font-medium">${p.date}</td>
                         <td class="p-3">${p.empId}</td>
                         <td class="p-3 font-semibold text-gray-900">${p.staffName}</td>
                         <td class="p-3">${p.station}</td>
                         <td class="p-3 font-bold text-orange-600">${Number(p.podValue).toLocaleString()}</td>
                         <td class="p-3"><span class="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded">${p.recruiter || '-'}</span></td>
-                        <td class="p-3 text-center"><button onclick="deletePodRecord(${index})" class="text-rose-600 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition">🗑️ ลบ</button></td>
+                        <td class="p-3 text-center">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <button onclick="editPodRecord(${index})" title="แก้ไข" class="text-blue-600 hover:bg-blue-50 p-1.5 rounded-lg text-xs cursor-pointer transition">✏️</button>
+                                <button onclick="deletePodRecord(${index})" title="ลบ" class="text-red-500 hover:bg-red-50 p-1.5 rounded-lg text-xs cursor-pointer transition">🗑️</button>
+                            </div>
+                        </td>
                     </tr>`;
             });
         }
@@ -1016,11 +1148,42 @@ Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branc
             alert('บันทึกยอด POD สำเร็จ!');
         });
 
+        function editPodRecord(index) {
+            const p = podRecords[index];
+            document.getElementById('podDate').value = p.date;
+            document.getElementById('podEmpId').value = p.empId;
+            document.getElementById('podStaffName').value = p.staffName;
+            document.getElementById('podStation').value = p.station;
+            document.getElementById('podValue').value = p.podValue;
+            document.getElementById('podRecruiter').value = p.recruiter;
+
+            podRecords.splice(index, 1);
+            saveUserData();
+            renderPodUI();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            alert('โหลดข้อมูล POD ลงฟอร์มเพื่อแก้ไขแล้วครับ');
+        }
+
         function deletePodRecord(index) {
             if (confirm('ลบรายการนี้ใช่หรือไม่?')) {
                 podRecords.splice(index, 1);
                 saveUserData();
                 renderPodUI();
+            }
+        }
+
+        function deleteSelectedPods() {
+            const selected = document.querySelectorAll('.pod-checkbox:checked');
+            if (selected.length === 0) {
+                alert('กรุณาติ๊กเลือกรายการ POD ที่ต้องการลบอย่างน้อย 1 รายการ');
+                return;
+            }
+            if (confirm(`คุณต้องการลบรายการ POD ${selected.length} รายการที่เลือกใช่หรือไม่?`)) {
+                const indexesToRemove = Array.from(selected).map(cb => parseInt(cb.value));
+                podRecords = podRecords.filter((_, idx) => !indexesToRemove.includes(idx));
+                saveUserData();
+                renderPodUI();
+                alert('ลบรายการ POD ที่เลือกเรียบร้อยแล้ว');
             }
         }
 
@@ -1037,17 +1200,25 @@ Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branc
         function renderWorkPlanUI() {
             workPlanTableBody.innerHTML = '';
             document.getElementById('wpRecordCount').innerText = `${workPlans.length} รายการ`;
+            document.getElementById('selectAllWorkPlans').checked = false;
+
             if (workPlans.length === 0) {
-                workPlanTableBody.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-gray-400">ยังไม่มีข้อมูล Work Plan</td></tr>`;
+                workPlanTableBody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400">ยังไม่มีข้อมูล Work Plan</td></tr>`;
                 return;
             }
             workPlans.forEach((wp, index) => {
                 let detailsHtml = wp.rows.map(r => r.detail ? `<div class="text-xs text-gray-700">• [No.${r.no}] ${r.detail} (${r.hour} ชม.)</div>` : '').join('');
                 workPlanTableBody.innerHTML += `
                     <tr class="hover:bg-gray-50 transition">
+                        <td class="p-3 text-center align-top"><input type="checkbox" value="${index}" class="workplan-checkbox rounded border-gray-300"></td>
                         <td class="p-3 font-medium align-top">${wp.date}</td>
                         <td class="p-3 align-top space-y-1">${detailsHtml || '<span class="text-gray-400">ไม่มีรายละเอียด</span>'}</td>
-                        <td class="p-3 align-top text-center"><button onclick="deleteWorkPlan(${index})" class="text-rose-600 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition">🗑️ ลบ</button></td>
+                        <td class="p-3 align-top text-center">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <button onclick="editWorkPlan(${index})" title="แก้ไข" class="text-blue-600 hover:bg-blue-50 p-1.5 rounded-lg text-xs cursor-pointer transition">✏️</button>
+                                <button onclick="deleteWorkPlan(${index})" title="ลบ" class="text-red-500 hover:bg-red-50 p-1.5 rounded-lg text-xs cursor-pointer transition">🗑️</button>
+                            </div>
+                        </td>
                     </tr>`;
             });
         }
@@ -1074,6 +1245,21 @@ Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branc
             alert('บันทึก Work Plan สำเร็จ!');
         });
 
+        function editWorkPlan(index) {
+            const wp = workPlans[index];
+            document.getElementById('wpDate').value = wp.date;
+            wp.rows.forEach(r => {
+                document.getElementById(`det_${r.no}`).value = r.detail;
+                document.getElementById(`hr_${r.no}`).value = r.hour;
+            });
+
+            workPlans.splice(index, 1);
+            saveUserData();
+            renderWorkPlanUI();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            alert('โหลดข้อมูล Work Plan ลงฟอร์มเพื่อแก้ไขแล้วครับ');
+        }
+
         function resetWpForm() {
             for (let i = 1; i <= 6; i++) {
                 document.getElementById(`det_${i}`).value = '';
@@ -1087,6 +1273,21 @@ Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branc
                 workPlans.splice(index, 1);
                 saveUserData();
                 renderWorkPlanUI();
+            }
+        }
+
+        function deleteSelectedWorkPlans() {
+            const selected = document.querySelectorAll('.workplan-checkbox:checked');
+            if (selected.length === 0) {
+                alert('กรุณาติ๊กเลือกรายการ Work Plan ที่ต้องการลบอย่างน้อย 1 รายการ');
+                return;
+            }
+            if (confirm(`คุณต้องการลบ Work Plan ${selected.length} รายการที่เลือกใช่หรือไม่?`)) {
+                const indexesToRemove = Array.from(selected).map(cb => parseInt(cb.value));
+                workPlans = workPlans.filter((_, idx) => !indexesToRemove.includes(idx));
+                saveUserData();
+                renderWorkPlanUI();
+                alert('ลบ Work Plan ที่เลือกเรียบร้อยแล้ว');
             }
         }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบรายงานประจำวัน - Pleang Recruit Team Recruiter Network</title>
+    <title>ระบบรายงานประจำวัน - Recruiter Network</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Chart.js สำหรับทำกราฟ -->
@@ -24,15 +24,15 @@
     <div id="loginModal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center">
             <div class="bg-orange-600 text-white font-bold w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 text-lg shadow-lg">
-                KEX
+                RN
             </div>
-            <h2 id="l-title" class="text-xl font-bold text-gray-800 mb-1">KEX Recruiter Login</h2>
-            <p id="l-desc" class="text-xs text-gray-500 mb-5">กรุณาระบุชื่อเจ้าหน้าที่สรรหาเพื่อเข้าสู่ระบบ (พิมพ์ "Super Admin" เพื่อดูข้อมูลทุกคน)</p>
+            <h2 id="l-title" class="text-xl font-bold text-gray-800 mb-1">Recruiter Login</h2>
+            <p id="l-desc" class="text-xs text-gray-500 mb-5">กรุณาระบุชื่อเจ้าหน้าที่สรรหาเพื่อเข้าสู่ระบบ (พิมพ์ "แม่" เพื่อดูข้อมูลทุกคน)</p>
             
             <form id="loginForm" class="space-y-4 text-left">
                 <div>
                     <label id="l-label" class="block text-xs font-semibold text-gray-600 uppercase mb-1">👤 ชื่อเจ้าหน้าที่สรรหา (Recruiter Name)</label>
-                    <input type="text" id="inputRecruiterName" placeholder="เช่น เพลง หรือ Super Admin" required class="w-full bg-gray-50 border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                    <input type="text" id="inputRecruiterName" placeholder="เช่น เพลง หรือ แม่" required class="w-full bg-gray-50 border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none">
                 </div>
                 <button type="submit" id="l-btn" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-3 rounded-xl transition shadow cursor-pointer">
                     เข้าสู่ระบบ
@@ -45,10 +45,10 @@
     <header class="bg-[#1e222b] text-white h-14 flex items-center justify-between px-3 sm:px-4 shadow-md shrink-0">
         <div class="flex items-center space-x-2">
             <div class="bg-orange-600 text-white font-bold p-1.5 rounded-lg text-xs flex items-center justify-center shadow">
-                KEX
+                RN
             </div>
             <div class="truncate">
-                <span class="font-bold text-xs sm:text-sm tracking-wide truncate block">KEX Recruiter Network.</span>
+                <span class="font-bold text-xs sm:text-sm tracking-wide truncate block">Recruiter Network.</span>
                 <span id="currentRecruiterDisplay" class="text-[10px] sm:text-xs text-orange-400 block -mt-1 truncate">ผู้ใช้งาน: -</span>
             </div>
         </div>
@@ -71,7 +71,7 @@
         <!-- VIEW 0: หน้าหลัก (Dashboard Hub) -->
         <div id="view-home" class="space-y-4 sm:space-y-6">
             <div class="bg-gradient-to-r from-slate-900 to-[#1e222b] rounded-2xl p-5 sm:p-8 text-white shadow-lg">
-                <h1 id="h-title" class="text-xl sm:text-3xl font-bold mb-2">👋 ยินดีต้อนรับสู่ระบบบริหารงานสรรหา Pleang Recruit Team</h1>
+                <h1 id="h-title" class="text-xl sm:text-3xl font-bold mb-2">👋 ยินดีต้อนรับสู่ระบบบริหารงานสรรหา</h1>
                 <p id="h-desc" class="text-gray-300 text-xs sm:text-sm">เลือกเมนูด้านล่างนี้เพื่อจัดการข้อมูล บันทึกรายงานประจำวัน และตรวจสอบสถิติต่างๆ</p>
             </div>
 
@@ -140,7 +140,6 @@
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 space-y-6">
-                <!-- สรุปข้อมูลตัวเลขจาก 6 ข้อกำหนด (ส่วนนี้คงไว้ตามคำขอ) -->
                 <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
                     <h3 class="text-xs sm:text-sm font-bold text-slate-800 mb-3" id="summary-6-title">📋 สรุปผลรวมตัวเลขจาก 6 ข้อกำหนด (ย้อนหลังทั้งหมด)</h3>
                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-center">
@@ -238,8 +237,8 @@
                     <div class="border border-gray-300 rounded-xl overflow-hidden shadow-sm">
                         <div class="bg-slate-900 text-white px-3 sm:px-4 py-2.5 font-bold text-xs sm:text-sm" id="sec-2-title">2. 入职渠道 (ช่องทางการสรรหา)</div>
                         <div class="p-3 sm:p-4 grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3 bg-white">
-                            <div><label class="block text-[10px] text-gray-600 mb-1">สาขาKexแนะนำ</label><input type="number" id="ch_kex_branch" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm"></div>
-                            <div><label class="block text-[10px] text-gray-600 mb-1">TA Kex แนะนำ</label><input type="number" id="ch_ta" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm"></div>
+                            <div><label class="block text-[10px] text-gray-600 mb-1" id="lbl-ch-branch">สาขาแนะนำ</label><input type="number" id="ch_kex_branch" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm"></div>
+                            <div><label class="block text-[10px] text-gray-600 mb-1" id="lbl-ch-ta">TA แนะนำ</label><input type="number" id="ch_ta" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm"></div>
                             <div><label class="block text-[10px] text-gray-600 mb-1" id="lbl-ch-other">ค่ายอื่น</label><input type="number" id="ch_other_camp" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm"></div>
                             <div><label class="block text-[10px] text-gray-600 mb-1">Online</label><input type="number" id="ch_online" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm"></div>
                             <div class="col-span-2 sm:col-span-1"><label class="block text-[10px] text-gray-600 mb-1" id="lbl-ch-others">อื่นๆ</label><input type="number" id="ch_others" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm"></div>
@@ -277,7 +276,7 @@
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-orange-50 p-3 sm:p-4 rounded-xl border border-orange-200">
-                        <div><label class="block text-[11px] font-semibold text-orange-900 mb-1" id="lbl-branch">🏢 สาขา Kex / Station</label><input type="text" id="branchKex" placeholder="SKV / BKKC2" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
+                        <div><label class="block text-[11px] font-semibold text-orange-900 mb-1" id="lbl-branch">🏢 สาขา / Station</label><input type="text" id="branchKex" placeholder="SKV / BKKC2" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
                         <div><label class="block text-[11px] font-semibold text-orange-900 mb-1" id="lbl-hour">⏰ ชั่วโมงทำงาน</label><input type="number" id="workingHours" value="8" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
                     </div>
 
@@ -323,7 +322,7 @@
                     <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-emp-name">ชื่อ-นามสกุล</label><input type="text" id="empName" placeholder="อรัญ" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
                     <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1">Station</label><input type="text" id="empStation" placeholder="SKV" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
                     <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-emp-type">ประเภท</label><select id="empType" class="w-full bg-white border rounded-lg p-2 text-sm"><option value="2W">2W</option><option value="4W">4W</option></select></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-emp-ch">ช่องทางสรรหา</label><select id="empChannel" class="w-full bg-white border rounded-lg p-2 text-sm"><option value="สาขาKexแนะนำ">สาขาKexแนะนำ</option><option value="TA Kex แนะนำ">TA Kex แนะนำ</option><option value="ค่ายอื่น">ค่ายอื่น</option><option value="Online">Online</option><option value="อื่นๆ">อื่นๆ</option></select></div>
+                    <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-emp-ch">ช่องทางสรรหา</label><select id="empChannel" class="w-full bg-white border rounded-lg p-2 text-sm"><option value="สาขาแนะนำ">สาขาแนะนำ</option><option value="TA แนะนำ">TA แนะนำ</option><option value="ค่ายอื่น">ค่ายอื่น</option><option value="Online">Online</option><option value="อื่นๆ">อื่นๆ</option></select></div>
                     <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-emp-stat">สถานะ</label><select id="empStatus" class="w-full bg-white border rounded-lg p-2 text-sm"><option value="Active">Active</option><option value="Resigned">Resigned</option></select></div>
                     <div class="sm:col-span-2 md:col-span-6 flex justify-end"><button type="submit" class="w-full sm:w-auto px-5 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition shadow cursor-pointer">+ เพิ่มพนักงาน</button></div>
                 </form>
@@ -470,13 +469,13 @@
 
         const translations = {
             th: {
-                loginTitle: "KEX Recruiter Login",
+                loginTitle: "Recruiter Login",
                 loginDesc: "กรุณาระบุชื่อเจ้าหน้าที่สรรหาเพื่อเข้าสู่ระบบ (พิมพ์ 'แม่' เพื่อดูข้อมูลทุกคน)",
                 loginLbl: "👤 ชื่อเจ้าหน้าที่สรรหา (Recruiter Name)",
                 loginBtn: "เข้าสู่ระบบ",
                 homeBtn: "🏠 หน้าหลัก",
                 logoutBtn: "ออก",
-                hTitle: "👋 ยินดีต้อนรับสู่ระบบบริหารงานสรรหา KEX",
+                hTitle: "👋 ยินดีต้อนรับสู่ระบบบริหารงานสรรหา",
                 hDesc: "เลือกเมนูด้านล่างนี้เพื่อจัดการข้อมูล บันทึกรายงานประจำวัน และตรวจสอบสถิติต่างๆ",
                 card1Title: "ภาพรวมผลงาน & กราฟคู่ POD",
                 card1Desc: "ดูกราฟเปรียบเทียบพนักงานมาทำงานกับยอดเซ็นรับพัสดุ (POD) ประจำวัน",
@@ -498,6 +497,8 @@
                 sec6Title: "6. 日度网点巡查规划 (แผนงานการออกตรวจเยี่ยมสาขา)",
                 lblInv: "จำนวนผู้ติดต่อ/นัดหมาย (邀约人数)",
                 lblOpen: "จำนวนเปิดรหัสพนักงาน (开号人数)",
+                lblChBranch: "สาขาแนะนำ",
+                lblChTa: "TA แนะนำ",
                 lblEff: "จำนวนบัญชีใช้งานจริง",
                 lblPod: "ยอดรวม POD (ชิ้น)",
                 lblResC: "จำนวนลาออก (คน)",
@@ -512,13 +513,13 @@
                 thWpDet: "รายละเอียดทั้ง 6 แถว"
             },
             zh: {
-                loginTitle: "KEX 招聘专员登录",
+                loginTitle: "招聘专员登录",
                 loginDesc: "请输入您的招聘专员姓名以登录系统 (输入 'แม่' 查看所有人的数据)",
                 loginLbl: "👤 招聘专员姓名 (Recruiter Name)",
                 loginBtn: "登录",
                 homeBtn: "🏠 首页",
                 logoutBtn: "退出",
-                hTitle: "👋 欢迎使用 KEX 招聘管理系统",
+                hTitle: "👋 欢迎使用招聘管理系统",
                 hDesc: "请选择下方菜单以管理数据、记录每日工作报告及查看统计信息。",
                 card1Title: "工作业绩概览与 POD 对比图",
                 card1Desc: "查看每日在岗人数与 POD 派送量的对比图表",
@@ -540,6 +541,8 @@
                 sec6Title: "6. 日度网点巡查规划 (每日网点巡查规划)",
                 lblInv: "预约/邀约人数 (邀约人数)",
                 lblOpen: "开号人数 (开号人数)",
+                lblChBranch: "分部推荐",
+                lblChTa: "TA 推荐",
                 lblEff: "有效账号数量 (有效账号)",
                 lblPod: "POD 派送总量 (件)",
                 lblResC: "离职人数 (人)",
@@ -594,6 +597,8 @@
 
             document.getElementById('lbl-inv').innerText = t.lblInv;
             document.getElementById('lbl-open').innerText = t.lblOpen;
+            document.getElementById('lbl-ch-branch').innerText = t.lblChBranch;
+            document.getElementById('lbl-ch-ta').innerText = t.lblChTa;
             document.getElementById('lbl-eff').innerText = t.lblEff;
             document.getElementById('lbl-pod').innerText = t.lblPod;
             document.getElementById('lbl-res-c').innerText = t.lblResC;
@@ -814,13 +819,13 @@
                 return;
             }
             const r = reports[0];
-            let text = `📋 KEX Daily Report
+            let text = `📋 Daily Report
 Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branchKex}
 
 1. 邀约人数，开号人数: นัดหมาย ${r.inviteCount || 0} คน / เปิดรหัส ${r.openCodeCount || 0} คน
 2. 入职渠道: 
-- สาขาKexแนะนำ: ${r.ch_kex_branch}
-- TA Kex แนะนำ: ${r.ch_ta}
+- สาขาแนะนำ: ${r.ch_kex_branch}
+- TA แนะนำ: ${r.ch_ta}
 - ค่ายอื่น: ${r.ch_other_camp}
 - Online: ${r.ch_online}
 - อื่นๆ: ${r.ch_others}
@@ -1088,7 +1093,7 @@ Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branc
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reports, null, 2));
             const dlAnchor = document.createElement('a');
             dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", `kex_daily_report_${currentRecruiter}.json`);
+            dlAnchor.setAttribute("download", `daily_report_${currentRecruiter}.json`);
             document.body.appendChild(dlAnchor);
             dlAnchor.click();
             dlAnchor.remove();

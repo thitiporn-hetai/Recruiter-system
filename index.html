@@ -98,7 +98,7 @@
                     <div>
                         <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg mb-3 shadow-sm">🗂️</div>
                         <h3 class="text-base font-bold text-gray-800 mb-1" id="card-3-title">ข้อมูลพนักงานจัดส่งพัสดุ</h3>
-                        <p class="text-xs text-gray-500" id="card-3-desc">จัดการรายชื่อ รหัสพนักงาน (EMP_ID) และช่องทางการสรรหา</p>
+                        <p class="text-xs text-gray-500" id="card-3-desc">จัดการรายชื่อ รหัสพนักงาน (EMP_ID) และช่องทางพนักงานเริ่มงาน</p>
                     </div>
                     <div class="mt-4 text-orange-600 text-xs font-semibold flex items-center gap-1">เปิดใช้งาน →</div>
                 </div>
@@ -139,9 +139,25 @@
                 <button onclick="goHome()" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs sm:text-sm font-medium rounded-xl transition cursor-pointer">← หน้าหลัก</button>
             </div>
 
+            <!-- ตัวกรองช่วงวันที่ -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <span class="text-xs font-bold text-gray-700">📅 ตั้งแต่วันที่:</span>
+                    <input type="date" id="filterStartDate" onchange="updateOverview()" class="bg-gray-50 border border-gray-300 rounded-lg p-2 text-xs sm:text-sm w-full sm:w-auto">
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <span class="text-xs font-bold text-gray-700">ถึงวันที่:</span>
+                    <input type="date" id="filterEndDate" onchange="updateOverview()" class="bg-gray-50 border border-gray-300 rounded-lg p-2 text-xs sm:text-sm w-full sm:w-auto">
+                </div>
+                <button onclick="resetFilterDate()" class="w-full sm:w-auto px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-lg transition cursor-pointer">แสดงทั้งหมด</button>
+            </div>
+
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 space-y-6">
                 <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <h3 class="text-xs sm:text-sm font-bold text-slate-800 mb-3" id="summary-6-title">📋 สรุปผลรวมตัวเลขจาก 6 ข้อกำหนด (ย้อนหลังทั้งหมด)</h3>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-1">
+                        <h3 class="text-xs sm:text-sm font-bold text-slate-800" id="summary-6-title">📋 สรุปผลรวมตัวเลขจาก 6 ข้อกำหนด</h3>
+                        <span id="dateRangeDisplay" class="text-xs font-semibold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-md border border-orange-200">📅 แสดงข้อมูล: ทั้งหมด</span>
+                    </div>
                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-center">
                         <div class="bg-white p-2.5 rounded-lg border border-slate-200">
                             <span class="text-[10px] text-gray-500 block">1. 邀约 (นัดหมาย)</span>
@@ -152,7 +168,7 @@
                             <span id="sum-open" class="text-base sm:text-lg font-bold text-emerald-600">0</span>
                         </div>
                         <div class="bg-white p-2.5 rounded-lg border border-slate-200">
-                            <span class="text-[10px] text-gray-500 block">2. 入职 (ช่องทางรวม)</span>
+                            <span class="text-[10px] text-gray-500 block">2. 入职 (เริ่มงานรวม)</span>
                             <span id="sum-channel" class="text-base sm:text-lg font-bold text-blue-600">0</span>
                         </div>
                         <div class="bg-white p-2.5 rounded-lg border border-slate-200">
@@ -235,13 +251,28 @@
 
                     <!-- ข้อ 2 -->
                     <div class="border border-gray-300 rounded-xl overflow-hidden shadow-sm">
-                        <div class="bg-slate-900 text-white px-3 sm:px-4 py-2.5 font-bold text-xs sm:text-sm" id="sec-2-title">2. 入职渠道 (ช่องทางการสรรหา)</div>
+                        <div class="bg-slate-900 text-white px-3 sm:px-4 py-2.5 font-bold text-xs sm:text-sm" id="sec-2-title">2. 入职渠道 (ช่องทางพนักงานเริ่มงาน)</div>
                         <div class="p-3 sm:p-4 grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3 bg-white">
-                            <div><label class="block text-[10px] text-gray-600 mb-1" id="lbl-ch-branch">สาขาแนะนำ</label><input type="number" id="ch_kex_branch" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm"></div>
-                            <div><label class="block text-[10px] text-gray-600 mb-1" id="lbl-ch-ta">TA แนะนำ</label><input type="number" id="ch_ta" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm"></div>
-                            <div><label class="block text-[10px] text-gray-600 mb-1" id="lbl-ch-other">ค่ายอื่น</label><input type="number" id="ch_other_camp" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm"></div>
-                            <div><label class="block text-[10px] text-gray-600 mb-1">Online</label><input type="number" id="ch_online" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm"></div>
-                            <div class="col-span-2 sm:col-span-1"><label class="block text-[10px] text-gray-600 mb-1" id="lbl-ch-others">อื่นๆ</label><input type="number" id="ch_others" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm"></div>
+                            <div>
+                                <label class="block text-[10px] text-gray-600 mb-1 font-medium" id="lbl-ch-branch">🏢 สาขาแนะนำ</label>
+                                <input type="number" id="ch_kex_branch" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-gray-600 mb-1 font-medium" id="lbl-ch-ta">🤝 TA แนะนำ</label>
+                                <input type="number" id="ch_ta" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-gray-600 mb-1 font-medium" id="lbl-ch-other">📦 ค่ายอื่น</label>
+                                <input type="number" id="ch_other_camp" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-gray-600 mb-1 font-medium">🌐 Online</label>
+                                <input type="number" id="ch_online" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm">
+                            </div>
+                            <div class="col-span-2 sm:col-span-1">
+                                <label class="block text-[10px] text-gray-600 mb-1 font-medium" id="lbl-ch-others">✨ อื่นๆ</label>
+                                <input type="number" id="ch_others" placeholder="0" class="w-full bg-gray-50 border rounded-lg p-2 text-sm">
+                            </div>
                         </div>
                     </div>
 
@@ -280,15 +311,16 @@
                         <div><label class="block text-[11px] font-semibold text-orange-900 mb-1" id="lbl-hour">⏰ ชั่วโมงทำงาน</label><input type="number" id="workingHours" value="8" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
                     </div>
 
-                    <div class="flex justify-end pt-2 no-print">
-                        <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-orange-600 text-white font-medium rounded-xl hover:bg-orange-700 transition shadow cursor-pointer">💾 บันทึก Daily Report</button>
+                    <div class="flex flex-col sm:flex-row justify-end gap-2 pt-2 no-print">
+                        <button type="reset" onclick="resetReportForm()" class="px-5 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-xl transition cursor-pointer">🧹 ล้างฟอร์ม (กรอกใหม่)</button>
+                        <button type="submit" class="px-6 py-3 bg-orange-600 text-white font-medium rounded-xl hover:bg-orange-700 transition shadow cursor-pointer">💾 บันทึก Daily Report</button>
                     </div>
                 </form>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mt-6 no-print">
                 <div class="p-4 border-b border-gray-200 font-bold text-gray-800 text-xs sm:text-sm flex justify-between items-center">
-                    <span id="hist-title">📋 ประวัติรายงานย้อนหลัง</span>
+                    <span id="hist-title">📋 ประวัติรายงานย้อนหลัง (กดลบได้หากกรอกผิด)</span>
                     <span id="recordCount" class="text-xs text-gray-500 font-normal">ทั้งหมด 0 รายการ</span>
                 </div>
                 <div class="overflow-x-auto">
@@ -322,13 +354,16 @@
                     <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-emp-name">ชื่อ-นามสกุล</label><input type="text" id="empName" placeholder="อรัญ" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
                     <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1">Station</label><input type="text" id="empStation" placeholder="SKV" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
                     <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-emp-type">ประเภท</label><select id="empType" class="w-full bg-white border rounded-lg p-2 text-sm"><option value="2W">2W</option><option value="4W">4W</option></select></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-emp-ch">ช่องทางสรรหา</label><select id="empChannel" class="w-full bg-white border rounded-lg p-2 text-sm"><option value="สาขาแนะนำ">สาขาแนะนำ</option><option value="TA แนะนำ">TA แนะนำ</option><option value="ค่ายอื่น">ค่ายอื่น</option><option value="Online">Online</option><option value="อื่นๆ">อื่นๆ</option></select></div>
+                    <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-emp-ch">ช่องทางเริ่มงาน</label><select id="empChannel" class="w-full bg-white border rounded-lg p-2 text-sm"><option value="สาขาแนะนำ">สาขาแนะนำ</option><option value="TA แนะนำ">TA แนะนำ</option><option value="ค่ายอื่น">ค่ายอื่น</option><option value="Online">Online</option><option value="อื่นๆ">อื่นๆ</option></select></div>
                     <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-emp-stat">สถานะ</label><select id="empStatus" class="w-full bg-white border rounded-lg p-2 text-sm"><option value="Active">Active</option><option value="Resigned">Resigned</option></select></div>
-                    <div class="sm:col-span-2 md:col-span-6 flex justify-end"><button type="submit" class="w-full sm:w-auto px-5 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition shadow cursor-pointer">+ เพิ่มพนักงาน</button></div>
+                    <div class="sm:col-span-2 md:col-span-6 flex justify-end gap-2">
+                        <button type="reset" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-medium rounded-lg transition cursor-pointer">🧹 ล้างช่องกรอก</button>
+                        <button type="submit" class="px-5 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition shadow cursor-pointer">+ เพิ่มพนักงาน</button>
+                    </div>
                 </form>
 
                 <div class="border border-gray-200 rounded-xl overflow-hidden">
-                    <div class="p-3 bg-gray-50 border-b text-xs font-semibold text-gray-600 flex justify-between"><span id="emp-list-title">รายชื่อพนักงาน</span><span id="employeeRecordCount">0 คน</span></div>
+                    <div class="p-3 bg-gray-50 border-b text-xs font-semibold text-gray-600 flex justify-between"><span id="emp-list-title">รายชื่อพนักงาน (กดลบได้หากกรอกผิด)</span><span id="employeeRecordCount">0 คน</span></div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs sm:text-sm min-w-[600px]">
                             <thead class="bg-gray-100 border-b text-gray-600 text-[11px] uppercase">
@@ -356,11 +391,14 @@
                     <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1">Station</label><input type="text" id="podStation" placeholder="SKV" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
                     <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-pod-val">ยอด POD</label><input type="number" step="0.01" id="podValue" placeholder="27" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
                     <div><label class="block text-[11px] font-semibold text-gray-600 uppercase mb-1" id="lbl-pod-rec">ชื่อผู้สรรหา</label><input type="text" id="podRecruiter" placeholder="ชื่อผู้สรรหา" required class="w-full bg-white border rounded-lg p-2 text-sm"></div>
-                    <div class="sm:col-span-2 md:col-span-6 flex justify-end"><button type="submit" class="w-full sm:w-auto px-5 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition shadow cursor-pointer">+ บันทึกยอด POD</button></div>
+                    <div class="sm:col-span-2 md:col-span-6 flex justify-end gap-2">
+                        <button type="reset" onclick="setPodDefaultDate()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-medium rounded-lg transition cursor-pointer">🧹 ล้างช่องกรอก</button>
+                        <button type="submit" class="px-5 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition shadow cursor-pointer">+ บันทึกยอด POD</button>
+                    </div>
                 </form>
 
                 <div class="border border-gray-200 rounded-xl overflow-hidden">
-                    <div class="p-3 bg-gray-50 border-b text-xs font-semibold text-gray-600 flex justify-between"><span id="pod-list-title">รายการ POD</span><span id="podRecordCount">0 รายการ</span></div>
+                    <div class="p-3 bg-gray-50 border-b text-xs font-semibold text-gray-600 flex justify-between"><span id="pod-list-title">รายการ POD (กดลบได้หากกรอกผิด)</span><span id="podRecordCount">0 รายการ</span></div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs sm:text-sm min-w-[550px]">
                             <thead class="bg-gray-100 border-b text-gray-600 text-[11px] uppercase">
@@ -425,13 +463,14 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-end pt-2">
-                        <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-orange-600 text-white font-medium rounded-xl hover:bg-orange-700 transition shadow cursor-pointer">💾 บันทึก Work Plan</button>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="reset" onclick="resetWpForm()" class="px-5 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-xl transition cursor-pointer">🧹 ล้างฟอร์ม</button>
+                        <button type="submit" class="px-6 py-3 bg-orange-600 text-white font-medium rounded-xl hover:bg-orange-700 transition shadow cursor-pointer">💾 บันทึก Work Plan</button>
                     </div>
                 </form>
 
                 <div class="border border-gray-200 rounded-xl overflow-hidden mt-6">
-                    <div class="p-3 bg-gray-50 border-b text-xs font-semibold text-gray-600 flex justify-between"><span id="wp-list-title">ประวัติ Work Plan ย้อนหลัง</span><span id="wpRecordCount">0 รายการ</span></div>
+                    <div class="p-3 bg-gray-50 border-b text-xs font-semibold text-gray-600 flex justify-between"><span id="wp-list-title">ประวัติ Work Plan ย้อนหลัง (กดลบได้หากกรอกผิด)</span><span id="wpRecordCount">0 รายการ</span></div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs sm:text-sm min-w-[500px]">
                             <thead class="bg-gray-100 border-b text-gray-600 text-[11px] uppercase">
@@ -482,7 +521,7 @@
                 card2Title: "Daily Report (6 ข้อกำหนด)",
                 card2Desc: "บันทึกรายงานประจำวัน 6 หัวข้อ พร้อมคัดลอกส่ง Line หรือดาวน์โหลด PDF",
                 card3Title: "ข้อมูลพนักงานจัดส่งพัสดุ",
-                card3Desc: "จัดการรายชื่อ รหัสพนักงาน (EMP_ID) และช่องทางการสรรหา",
+                card3Desc: "จัดการรายชื่อ รหัสพนักงาน (EMP_ID) และช่องทางพนักงานเริ่มงาน",
                 card4Title: "บันทึกยอด POD รายบุคคล",
                 card4Desc: "บันทึกและจัดการยอดจัดส่งพัสดุของพนักงานแต่ละคน",
                 card5Title: "Work Plan (แผนงาน 6 แถว)",
@@ -490,15 +529,17 @@
                 card6Title: "วิเคราะห์การลาออก",
                 card6Desc: "รวบรวมสถิติและเหตุผลการลาออกของพนักงานในระบบ",
                 sec1Title: "1. 邀约人数，开号人数 (นัดหมาย และเปิดรหัสพนักงาน)",
-                sec2Title: "2. 入职渠道 (ช่องทางการสรรหา)",
+                sec2Title: "2. 入职渠道 (ช่องทางพนักงานเริ่มงาน)",
                 sec3Title: "3. 有效账号 (จำนวนบัญชีใช้งานจริง)",
                 sec4Title: "4. 日度订单达成 (ยอดส่งพัสดุ POD)",
                 sec5Title: "5. 人员离职详细信息 (รายละเอียดพนักงานลาออก)",
                 sec6Title: "6. 日度网点巡查规划 (แผนงานการออกตรวจเยี่ยมสาขา)",
                 lblInv: "จำนวนผู้ติดต่อ/นัดหมาย (邀约人数)",
                 lblOpen: "จำนวนเปิดรหัสพนักงาน (开号人数)",
-                lblChBranch: "สาขาแนะนำ",
-                lblChTa: "TA แนะนำ",
+                lblChBranch: "🏢 สาขาแนะนำ",
+                lblChTa: "🤝 TA แนะนำ",
+                lblChOther: "📦 ค่ายอื่น",
+                lblChOthers: "✨ อื่นๆ",
                 lblEff: "จำนวนบัญชีใช้งานจริง",
                 lblPod: "ยอดรวม POD (ชิ้น)",
                 lblResC: "จำนวนลาออก (คน)",
@@ -507,7 +548,7 @@
                 podHeading: "📦 บันทึกยอด POD รายบุคคล",
                 lblPodRec: "ชื่อผู้สรรหา",
                 thPodRec: "ผู้สรรหา",
-                summary6Title: "📋 สรุปผลรวมตัวเลขจาก 6 ข้อกำหนด (ย้อนหลังทั้งหมด)",
+                summary6Title: "📋 สรุปผลรวมตัวเลขจาก 6 ข้อกำหนด",
                 wpHeading: "📅 Work Plan (แผนการทำงานประจำวัน 6 แถว)",
                 thWpDate: "วันที่",
                 thWpDet: "รายละเอียดทั้ง 6 แถว"
@@ -541,8 +582,10 @@
                 sec6Title: "6. 日度网点巡查规划 (每日网点巡查规划)",
                 lblInv: "预约/邀约人数 (邀约人数)",
                 lblOpen: "开号人数 (开号人数)",
-                lblChBranch: "分部推荐",
-                lblChTa: "TA 推荐",
+                lblChBranch: "🏢 分部推荐",
+                lblChTa: "🤝 TA 推荐",
+                lblChOther: "📦 其他快递",
+                lblChOthers: "✨ 其他渠道",
                 lblEff: "有效账号数量 (有效账号)",
                 lblPod: "POD 派送总量 (件)",
                 lblResC: "离职人数 (人)",
@@ -551,7 +594,7 @@
                 podHeading: "📦 个人 POD 派送业绩记录",
                 lblPodRec: "招聘专员姓名",
                 thPodRec: "招聘专员",
-                summary6Title: "📋 6项核心指标数据汇总 (所有历史日报)",
+                summary6Title: "📋 6项核心指标数据汇总",
                 wpHeading: "📅 Work Plan (工作计划 6行表单)",
                 thWpDate: "日期",
                 thWpDet: "6行工作详情汇总"
@@ -599,6 +642,8 @@
             document.getElementById('lbl-open').innerText = t.lblOpen;
             document.getElementById('lbl-ch-branch').innerText = t.lblChBranch;
             document.getElementById('lbl-ch-ta').innerText = t.lblChTa;
+            document.getElementById('lbl-ch-other').innerText = t.lblChOther;
+            document.getElementById('lbl-ch-others').innerText = t.lblChOthers;
             document.getElementById('lbl-eff').innerText = t.lblEff;
             document.getElementById('lbl-pod').innerText = t.lblPod;
             document.getElementById('lbl-res-c').innerText = t.lblResC;
@@ -770,7 +815,7 @@
                             <div class="text-gray-500 mt-0.5 truncate max-w-[150px]"><b>แผน:</b> ${r.siteInspectionPlan || '-'}</div>
                         </td>
                         <td class="p-3 align-top text-center">
-                            <button onclick="deleteReport(${index})" class="text-rose-500 bg-rose-50 p-1.5 rounded-lg text-xs cursor-pointer">ลบ</button>
+                            <button onclick="deleteReport(${index})" class="text-rose-600 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition">🗑️ ลบ</button>
                         </td>
                     </tr>`;
             });
@@ -804,8 +849,14 @@
             alert('บันทึก Daily Report สำเร็จ!');
         });
 
+        function resetReportForm() {
+            reportForm.reset();
+            setDefaultDate();
+            document.getElementById('reportName').value = currentRecruiter === 'แม่' ? 'แม่' : currentRecruiter;
+        }
+
         function deleteReport(index) {
-            if (confirm('คุณต้องการลบรายงานนี้ใช่หรือไม่?')) {
+            if (confirm('คุณต้องการลบรายงานรายการนี้ใช่หรือไม่?')) {
                 reports.splice(index, 1);
                 saveUserData();
                 renderUI();
@@ -824,11 +875,11 @@ Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branc
 
 1. 邀约人数，开号人数: นัดหมาย ${r.inviteCount || 0} คน / เปิดรหัส ${r.openCodeCount || 0} คน
 2. 入职渠道: 
-- สาขาแนะนำ: ${r.ch_kex_branch}
-- TA แนะนำ: ${r.ch_ta}
-- ค่ายอื่น: ${r.ch_other_camp}
-- Online: ${r.ch_online}
-- อื่นๆ: ${r.ch_others}
+- 🏢 สาขาแนะนำ: ${r.ch_kex_branch}
+- 🤝 TA แนะนำ: ${r.ch_ta}
+- 📦 ค่ายอื่น: ${r.ch_other_camp}
+- 🌐 Online: ${r.ch_online}
+- ✨ อื่นๆ: ${r.ch_others}
 3. 有效账号: บัญชีใช้งานจริง ${r.effectiveAccounts || 0} คน
 4. 日度订单达成: ยอดส่ง POD รวม ${Number(r.dailyOrders || 0).toLocaleString()} ชิ้น
 5. 人员离职详细信息: ลาออก ${r.resignedCount || 0} คน (${r.resignationDetail || 'ไม่มี'})
@@ -857,7 +908,7 @@ Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branc
                         <td class="p-3"><span class="bg-gray-100 text-[10px] px-2 py-0.5 rounded">${emp.type}</span></td>
                         <td class="p-3"><span class="bg-orange-50 text-orange-700 text-[10px] px-2 py-0.5 rounded">${emp.channel || '-'}</span></td>
                         <td class="p-3"><span class="${emp.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'} text-[10px] px-2 py-0.5 rounded-full font-medium">${emp.status}</span></td>
-                        <td class="p-3 text-center"><button onclick="deleteEmployee(${index})" class="text-rose-500 bg-rose-50 p-1.5 rounded-lg text-xs cursor-pointer">ลบ</button></td>
+                        <td class="p-3 text-center"><button onclick="deleteEmployee(${index})" class="text-rose-600 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition">🗑️ ลบ</button></td>
                     </tr>`;
             });
         }
@@ -902,7 +953,7 @@ Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branc
                         <td class="p-3">${p.station}</td>
                         <td class="p-3 font-bold text-orange-600">${Number(p.podValue).toLocaleString()}</td>
                         <td class="p-3"><span class="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded">${p.recruiter || '-'}</span></td>
-                        <td class="p-3 text-center"><button onclick="deletePodRecord(${index})" class="text-rose-500 bg-rose-50 p-1.5 rounded-lg text-xs cursor-pointer">ลบ</button></td>
+                        <td class="p-3 text-center"><button onclick="deletePodRecord(${index})" class="text-rose-600 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition">🗑️ ลบ</button></td>
                     </tr>`;
             });
         }
@@ -947,7 +998,7 @@ Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branc
                     <tr class="hover:bg-gray-50 transition">
                         <td class="p-3 font-medium align-top">${wp.date}</td>
                         <td class="p-3 align-top space-y-1">${detailsHtml || '<span class="text-gray-400">ไม่มีรายละเอียด</span>'}</td>
-                        <td class="p-3 align-top text-center"><button onclick="deleteWorkPlan(${index})" class="text-rose-500 bg-rose-50 p-1.5 rounded-lg text-xs cursor-pointer">ลบ</button></td>
+                        <td class="p-3 align-top text-center"><button onclick="deleteWorkPlan(${index})" class="text-rose-600 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition">🗑️ ลบ</button></td>
                     </tr>`;
             });
         }
@@ -970,14 +1021,17 @@ Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branc
 
             saveUserData();
             renderWorkPlanUI();
-            
+            resetWpForm();
+            alert('บันทึก Work Plan สำเร็จ!');
+        });
+
+        function resetWpForm() {
             for (let i = 1; i <= 6; i++) {
                 document.getElementById(`det_${i}`).value = '';
                 document.getElementById(`hr_${i}`).value = i === 1 ? '8' : '0';
             }
             setWpDefaultDate();
-            alert('บันทึก Work Plan สำเร็จ!');
-        });
+        }
 
         function deleteWorkPlan(index) {
             if (confirm('ลบรายการแผนงานนี้ใช่หรือไม่?')) {
@@ -987,10 +1041,43 @@ Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branc
             }
         }
 
+        function resetFilterDate() {
+            document.getElementById('filterStartDate').value = '';
+            document.getElementById('filterEndDate').value = '';
+            updateOverview();
+        }
+
         function updateOverview() {
+            const startDate = document.getElementById('filterStartDate').value;
+            const endDate = document.getElementById('filterEndDate').value;
+
+            let filteredReports = reports;
+            let filteredPodRecords = podRecords;
+
+            if (startDate) {
+                filteredReports = filteredReports.filter(r => r.date >= startDate);
+                filteredPodRecords = filteredPodRecords.filter(p => p.date >= startDate);
+            }
+            if (endDate) {
+                filteredReports = filteredReports.filter(r => r.date <= endDate);
+                filteredPodRecords = filteredPodRecords.filter(p => p.date <= endDate);
+            }
+
+            // แสดงข้อความช่วงวันที่
+            const dateRangeDisplay = document.getElementById('dateRangeDisplay');
+            if (startDate && endDate) {
+                dateRangeDisplay.innerText = `📅 ช่วงวันที่: ${startDate} ถึง ${endDate}`;
+            } else if (startDate) {
+                dateRangeDisplay.innerText = `📅 ตั้งแต่วันที่: ${startDate} เป็นต้นไป`;
+            } else if (endDate) {
+                dateRangeDisplay.innerText = `📅 ถึงวันที่: ${endDate}`;
+            } else {
+                dateRangeDisplay.innerText = `📅 แสดงข้อมูล: ทั้งหมด`;
+            }
+
             let sumInvite = 0, sumOpen = 0, sumChannel = 0, sumEffective = 0, sumOrders = 0, sumResignedRep = 0;
 
-            reports.forEach(r => {
+            filteredReports.forEach(r => {
                 sumInvite += Number(r.inviteCount || 0);
                 sumOpen += Number(r.openCodeCount || 0);
                 sumChannel += Number(r.ch_kex_branch || 0) + Number(r.ch_ta || 0) + Number(r.ch_other_camp || 0) + Number(r.ch_online || 0) + Number(r.ch_others || 0);
@@ -1006,24 +1093,24 @@ Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branc
             document.getElementById('sum-orders').innerText = sumOrders.toLocaleString();
             document.getElementById('sum-resigned').innerText = sumResignedRep.toLocaleString();
 
-            renderDualChart();
+            renderDualChart(filteredReports, filteredPodRecords);
         }
 
-        function renderDualChart() {
+        function renderDualChart(activeReports, activePodRecords) {
             const dateSet = new Set();
-            reports.forEach(r => dateSet.add(r.date));
-            podRecords.forEach(p => dateSet.add(p.date));
+            activeReports.forEach(r => dateSet.add(r.date));
+            activePodRecords.forEach(p => dateSet.add(p.date));
             const sortedDates = Array.from(dateSet).sort();
 
             const podMap = {};
-            reports.forEach(r => { podMap[r.date] = Number(r.dailyOrders || 0); });
-            podRecords.forEach(p => {
+            activeReports.forEach(r => { podMap[r.date] = Number(r.dailyOrders || 0); });
+            activePodRecords.forEach(p => {
                 if (!podMap[p.date]) podMap[p.date] = 0;
                 podMap[p.date] += Number(p.podValue || 0);
             });
 
             const attendMap = {};
-            reports.forEach(r => { attendMap[r.date] = Number(r.effectiveAccounts || 0); });
+            activeReports.forEach(r => { attendMap[r.date] = Number(r.effectiveAccounts || 0); });
 
             const podData = sortedDates.map(d => podMap[d] || 0);
             const attendData = sortedDates.map(d => attendMap[d] || 0);
@@ -1034,7 +1121,7 @@ Employee ID: ${r.empId} | Name: ${r.name} | Date: ${r.date} | Station: ${r.branc
             dualChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: sortedDates.length > 0 ? sortedDates : ['ยังไม่มีข้อมูล'],
+                    labels: sortedDates.length > 0 ? sortedDates : ['ยังไม่มีข้อมูลในช่วงเวลานี้'],
                     datasets: [
                         { type: 'bar', label: 'ยอด POD (ชิ้น)', data: sortedDates.length > 0 ? podData : [0], backgroundColor: 'rgba(234, 88, 12, 0.7)', borderColor: 'rgb(194, 65, 12)', borderWidth: 1, borderRadius: 6, yAxisID: 'y' },
                         { type: 'line', label: 'บัญชีใช้งาน (คน)', data: sortedDates.length > 0 ? attendData : [0], backgroundColor: 'rgba(16, 185, 129, 1)', borderColor: 'rgb(16, 185, 129)', borderWidth: 2, tension: 0.1, yAxisID: 'y1' }
